@@ -1,5 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <groupId>com.zyndev</groupId>
     <artifactId>zyntool-fastsql</artifactId>
     <version>1.0-SNAPSHOT</version>
@@ -13,6 +14,34 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://github.com/zyndev/fastsql</url>
+        <connection>https://github.com/zyndev/fastsql.git</connection>
+        <developerConnection>https://github.com/zyndev/fastsql</developerConnection>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>zyndev</name>
+            <email>zyndev@gmail.com</email>
+            <url>https://github.com/CallThink/Tools</url>
+        </developer>
+    </developers>
 
     <dependencies>
         <dependency>
@@ -71,25 +100,19 @@
             <version>4.3.8.RELEASE</version>
         </dependency>
 
-        <!-- 数据库链接部分 -->
-        <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.39</version>
-        </dependency>
-
         <!-- https://mvnrepository.com/artifact/com.alibaba/druid -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
             <version>1.0.29</version>
         </dependency>
+
         <dependency>
             <groupId>commons-jexl</groupId>
             <artifactId>commons-jexl</artifactId>
             <version>1.1</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
@@ -97,6 +120,7 @@
         </dependency>
 
     </dependencies>
+
     <build>
         <resources>
             <resource>
