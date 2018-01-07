@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:property-placeholder location="classpath:/jdbc.properties"/>
+
+
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <property name="driverClassName">
+            <value>${jdbc_driverClassName}</value>
+        </property>
+        <property name="url">
+            <value>${jdbc_url}</value>
+        </property>
+        <property name="username">
+            <value>${jdbc_username}</value>
+        </property>
+        <property name="password">
+            <value>${jdbc_password}</value>
+        </property>
+    </bean>
+
+
+    <bean id="myBeanFactoryPostProcessor" class="com.zyndev.tool.fastsql.core.FastSqlProcessor">
+        <property name="basePackage" value="com.zyndev.tool"/>
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+
+</beans>
