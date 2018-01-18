@@ -32,8 +32,8 @@ import java.lang.annotation.Target;
  * 查询操作 sql
  *
  * @author 张瑀楠 zyndev@gmail.com
- * @version 1.0
- * @date 2017/12/22 17:26
+ * @version 0.0.1
+ * @since  2017/12/22 17:26
  */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

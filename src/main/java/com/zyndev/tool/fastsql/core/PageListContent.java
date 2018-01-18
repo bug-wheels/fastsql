@@ -21,8 +21,10 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.zyndev;
+package com.zyndev.tool.fastsql.core;
 
+
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.List;
@@ -34,6 +36,7 @@ import java.util.List;
  *
  * @author yunan.zhang zyndev@gmail.com
  */
+@Data
 public class PageListContent<T> implements Serializable {
     private static final long serialVersionUID = 1L;
     private List<T> content;
@@ -41,12 +44,6 @@ public class PageListContent<T> implements Serializable {
     private int pageSize;
     private int totalNum;
     private int totalPages;
-
-    /**
-     * Instantiates a new Page list content.
-     */
-    public PageListContent() {
-    }
 
     /**
      * Sets data.
@@ -64,95 +61,5 @@ public class PageListContent<T> implements Serializable {
         this.totalPages = (totalNum + pageSize - 1) / pageSize;
         this.content = content;
         return this;
-    }
-
-    /**
-     * Gets content.
-     *
-     * @return the content
-     */
-    public List<T> getContent() {
-        return this.content;
-    }
-
-    /**
-     * Sets content.
-     *
-     * @param content the content
-     */
-    public void setContent(List<T> content) {
-        this.content = content;
-    }
-
-    /**
-     * Gets page num.
-     *
-     * @return the page num
-     */
-    public int getPageNum() {
-        return this.pageNum;
-    }
-
-    /**
-     * Sets page num.
-     *
-     * @param pageNum the page num
-     */
-    public void setPageNum(int pageNum) {
-        this.pageNum = pageNum;
-    }
-
-    /**
-     * Gets page size.
-     *
-     * @return the page size
-     */
-    public int getPageSize() {
-        return this.pageSize;
-    }
-
-    /**
-     * Sets page size.
-     *
-     * @param pageSize the page size
-     */
-    public void setPageSize(int pageSize) {
-        this.pageSize = pageSize;
-    }
-
-    /**
-     * Gets total num.
-     *
-     * @return the total num
-     */
-    public int getTotalNum() {
-        return this.totalNum;
-    }
-
-    /**
-     * Sets total num.
-     *
-     * @param totalNum the total num
-     */
-    public void setTotalNum(int totalNum) {
-        this.totalNum = totalNum;
-    }
-
-    /**
-     * Gets total pages.
-     *
-     * @return the total pages
-     */
-    public int getTotalPages() {
-        return this.totalPages;
-    }
-
-    /**
-     * Sets total pages.
-     *
-     * @param totalPages the total pages
-     */
-    public void setTotalPages(int totalPages) {
-        this.totalPages = totalPages;
     }
 }

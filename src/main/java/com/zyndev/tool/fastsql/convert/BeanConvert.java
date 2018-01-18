@@ -29,11 +29,13 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import java.lang.reflect.Field;
 
 /**
- * 这里应该有描述
+ * The type Bean convert.
+ *
+ * bean 转换器，将SqlRowSet 转换为对应的bean
  *
  * @author 张瑀楠 zyndev@gmail.com
- * @version 1.0
- * @date 2017 /12/27 17:33
+ * @version 0.0.1
+ * @since 2017 /12/27 17:33
  */
 public class BeanConvert {
 

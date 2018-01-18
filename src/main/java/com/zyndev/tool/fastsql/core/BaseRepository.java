@@ -26,12 +26,13 @@ package com.zyndev.tool.fastsql.core;
 
 import java.util.List;
 
+
 /**
  * The type Base repository.
  *
  * @author 张瑀楠 zyndev@gmail.com
- * @version 1.0
- * @date 2017-12-27 14:48:43
+ * @version 0.0.1
+ * @since 2017 -12-27 14:48:43
  */
 public interface BaseRepository {
 
@@ -54,11 +55,31 @@ public interface BaseRepository {
     /**
      * Update int.
      *
+     * @param entity  the entity
+     * @param columns the columns
+     * @return the int
+     */
+    int update(Object entity, String... columns);
+
+    /**
+     * Update int.
+     *
      * @param entity     the entity
      * @param ignoreNull the ignore null
      * @return the int
      */
     int update(Object entity, boolean ignoreNull);
+
+
+    /**
+     * Update int.
+     *
+     * @param entity     the entity
+     * @param ignoreNull the ignore null
+     * @param columns    the columns
+     * @return the int
+     */
+    int update(Object entity, boolean ignoreNull, String... columns);
 
     /**
      * Delete int.
@@ -85,7 +106,7 @@ public interface BaseRepository {
      * @param columns the columns
      * @return the e
      */
-    <E> E findById(E entity, String columns);
+    <E> E findById(E entity, String... columns);
 
     /**
      * Gets entity list.
@@ -96,39 +117,98 @@ public interface BaseRepository {
      */
     <E> List<E> getEntityList(E entity);
 
+    /**
+     * Gets entity list.
+     *
+     * @param <E>     the type parameter
+     * @param entity  the entity
+     * @param columns the columns
+     * @return the entity list
+     */
+    <E> List<E> getEntityList(E entity, String... columns);
 
-//    public List getObjectList(Object obj,String colums);
-//
-//
-//    public int updateSqlParam(String sql, Object[] objArray);
-//
-//    public int updateSql(String sql);
-//
-//
-//
-//    public int[] batchUpateSql(String[] sqls);
-//    public int updateByMap(String tableName, Map<String, Object> updateMap, Map<String, Object> wherMap);
-//
-//
-//
-//
-//
-//    public Integer getInteger(String sql);
-//
-//
-//
-//    public List getObjectList(String sql, Class clazz);
-//
-//    public List getObjectList(String sql, Object[] args, Class clazz);
-//
-//
-//
-//    public List getObjectListByOrderByPro(Object obj, Page page, String orderBy, String colums);
-//
-//    //根据sql查对象
-//    public List getObjectListBySql(String sql, Object[] args, Object obj, String colums);
-//
-//    public List getObjectPageListBySql(String sql, Object[] args, Object obj, Page page, String colums);
-//
-//    public List getObjectListBySql(String sql, Object obj, String colums);
+    /**
+     * Gets entity list.
+     *
+     * @param <E>    the type parameter
+     * @param sql    the sql
+     * @param entity the entity
+     * @return the entity list
+     */
+    <E> List<E> getEntityList(String sql, E entity);
+
+    /**
+     * Gets entity list.
+     *
+     * @param <E>    the type parameter
+     * @param sql    the sql
+     * @param args   the args
+     * @param entity the entity
+     * @return the entity list
+     */
+    <E> List<E> getEntityList(String sql, Object[] args, E entity);
+
+    /**
+     * Gets entity page list.
+     *
+     * @param <E>      the type parameter
+     * @param entity   the entity
+     * @param pageNum  the page num
+     * @param pageSize the page size
+     * @return the entity page list
+     */
+    <E> PageListContent<E> getEntityPageList(E entity, int pageNum, int pageSize);
+
+    /**
+     * Gets entity page list.
+     *
+     * @param <E>      the type parameter
+     * @param entity   the entity
+     * @param pageNum  the page num
+     * @param pageSize the page size
+     * @param columns  the columns
+     * @return the entity page list
+     */
+    <E> PageListContent<E> getEntityPageList(E entity, int pageNum, int pageSize, String... columns);
+
+    /**
+     * Gets entity page list by sql.
+     *
+     * @param <E>      the type parameter
+     * @param sql      the sql
+     * @param entity   the entity
+     * @param pageNum  the page num
+     * @param pageSize the page size
+     * @param columns  the columns
+     * @return the entity page list by sql
+     */
+    <E> PageListContent<E> getEntityPageListBySql(String sql, E entity, int pageNum, int pageSize, String... columns);
+
+    /**
+     * Gets entity page list by sql.
+     *
+     * @param <E>      the type parameter
+     * @param sql      the sql
+     * @param entity   the entity
+     * @param pageNum  the page num
+     * @param pageSize the page size
+     * @param orderBy  the order by
+     * @param columns  the columns
+     * @return the entity page list by sql
+     */
+    <E> PageListContent<E> getEntityPageListBySql(String sql, E entity, int pageNum, int pageSize, String orderBy, String... columns);
+
+    /**
+     * Gets entity page list by sql.
+     *
+     * @param <E>      the type parameter
+     * @param sql      the sql
+     * @param args     the args
+     * @param entity   the entity
+     * @param pageNum  the page num
+     * @param pageSize the page size
+     * @param columns  the columns
+     * @return the entity page list by sql
+     */
+    <E> PageListContent<E> getEntityPageListBySql(String sql, Object[] args, E entity, int pageNum, int pageSize, String... columns);
 }
