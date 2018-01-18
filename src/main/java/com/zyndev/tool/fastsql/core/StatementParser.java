@@ -50,9 +50,8 @@ import java.util.Map;
  * 暂时只能处理 select count(*) from tb_user 类似语句
  *
  * @author 张瑀楠 zyndev@gmail.com
- * @version 1.0
- * @date 2017 /12/23 下午12:11
- * todo 根据方法解析成对应的sql 执行 并封装结果集
+ * @version 0.0.1
+ * @since 2017 /12/23 下午12:11
  */
 class StatementParser {
 

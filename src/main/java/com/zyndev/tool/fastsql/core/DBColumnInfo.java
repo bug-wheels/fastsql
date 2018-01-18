@@ -29,6 +29,7 @@ import lombok.Data;
  * The type Db column info.
  *
  * @author 张瑀楠 zyndev@gmail.com
+ * @version 0.0.1
  */
 @Data
 class DBColumnInfo {

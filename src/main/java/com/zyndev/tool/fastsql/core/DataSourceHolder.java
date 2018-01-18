@@ -31,8 +31,8 @@ import javax.sql.DataSource;
  * 保存一下 dataSource
  *
  * @author 张瑀楠 zyndev@gmail.com
- * @version 1.0
- * @date 2017 /12/23 下午1:13
+ * @version 0.0.1
+ * @since 2017 /12/23 下午1:13
  */
 public class DataSourceHolder {
 

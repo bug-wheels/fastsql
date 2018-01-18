@@ -35,6 +35,7 @@ import java.util.List;
  * @param <T> the type parameter
  *
  * @author yunan.zhang zyndev@gmail.com
+ * @version 0.0.1
  */
 @Data
 public class PageListContent<T> implements Serializable {
