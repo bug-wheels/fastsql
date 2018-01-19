@@ -34,8 +34,8 @@ import java.lang.reflect.Proxy;
  * 生成代理
  *
  * @author 张瑀楠 zyndev@gmail.com
- * @version 1.0
- * @date 2017 /12/23 上午12:40
+ * @version 0.0.1
+ * @since  2017 /12/23 上午12:40
  */
 @SuppressWarnings("unchecked")
 public class FacadeProxy implements InvocationHandler {

@@ -23,18 +23,26 @@
 
 package com.zyndev.tool.fastsql.core;
 
+import org.springframework.jdbc.core.JdbcTemplate;
+
 import javax.sql.DataSource;
 
 /**
  * 保存一下 dataSource
  *
  * @author 张瑀楠 zyndev@gmail.com
- * @version 1.0
- * @date 2017 /12/23 下午1:13
+ * @version 0.0.1
+ * @since 2017 /12/23 下午1:13
  */
 public class DataSourceHolder {
 
     private static DataSourceHolder instance = new DataSourceHolder();
+
+    private static JdbcTemplate jdbcTemplate;
+
+    public static JdbcTemplate getJdbcTemplate() {
+        return jdbcTemplate;
+    }
 
     private DataSourceHolder() {
     }
@@ -66,5 +74,6 @@ public class DataSourceHolder {
      */
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
+        jdbcTemplate = new JdbcTemplate(dataSource);
     }
 }

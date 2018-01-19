@@ -42,8 +42,8 @@ import java.util.Set;
  * 扫描可以执行的 Repository 接口 并生成代理添加到 beanFactory 中
  *
  * @author 张瑀楠 zyndev@gmail.com
- * @version 1.0
- * @date 2017 /12/22 下午10:14
+ * @version 0.0.1
+ * @since 2017 /12/22 下午10:14
  */
 public class FastSqlProcessor implements BeanFactoryPostProcessor {
 

@@ -37,9 +37,11 @@ import java.util.List;
 /**
  * The type Annotation parser.
  *
+ * 注解解析工具
+ *
  * @author yunan.zhang zyndev@gmail.com
- * @version 1.0
- * @date 2017-12-26 16:59:07
+ * @version 0.0.1
+ * @since 2017-12-26 16:59:07
  */
 public class AnnotationParser {
 

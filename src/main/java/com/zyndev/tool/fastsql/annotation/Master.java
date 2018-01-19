@@ -1,5 +1,3 @@
-
-
 /*
  * The MIT License (MIT)
  *
@@ -34,8 +32,8 @@ import java.lang.annotation.Target;
  * 强制查询主库
  *
  * @author 张瑀楠 zyndev@gmail.com
- * @version 1.0
- * @date 2017/12/22 17:43
+ * @version 0.0.1
+ * @since  2017/12/22 17:43
  */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

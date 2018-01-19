@@ -24,6 +24,7 @@ public class Student {
     @Column
     private String name;
 
+    @Column(updatable = true, insertable = true, nullable = false)
     private Integer age;
 
 

@@ -32,11 +32,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 这里应该有描述
+ * The type List convert.
+ *
+ * 将对应的sqlRowSet 转换为 list
  *
  * @author 张瑀楠 zyndev@gmail.com
- * @version 1.0
- * @date 2017 /12/27 18:16 TODO:
+ * @version 0.0.1
+ * @since 2017 /12/27 18:16
  */
 public class ListConvert {
 

@@ -32,11 +32,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 这里应该有描述
+ * The type Set convert.
+ *
+ * 将对应的sqlRowSet 转换为 set
  *
  * @author 张瑀楠 zyndev@gmail.com
- * @version 1.0
- * @date 2017 /12/27 17:44 TODO:
+ * @version 0.0.1
+ * @since 2017 /12/27 17:44
  */
 public class SetConvert {
 

@@ -1,27 +1,18 @@
 # zyntool
 ```
-                                                           
-                                                       ,,  
-                               mm                    `7MM  
-                               MM                      MM  
-M"""MMV `7M'   `MF'`7MMpMMMb.mmMMmm ,pW"Wq.   ,pW"Wq.  MM  
-'  AMV    VA   ,V    MM    MM  MM  6W'   `Wb 6W'   `Wb MM  
-  AMV      VA ,V     MM    MM  MM  8M     M8 8M     M8 MM  
- AMV  ,     VVV      MM    MM  MM  YA.   ,A9 YA.   ,A9 MM  
-AMMmmmM     ,V     .JMML  JMML.`Mbmo`Ybmd9'   `Ybmd9'.JMML.
-           ,V                                              
-        OOb"       
+                                                                     
+   ad88                                                          88  
+  d8"                             ,d                             88  
+  88                              88                             88  
+MM88MMM  ,adPPYYba,  ,adPPYba,  MM88MMM  ,adPPYba,   ,adPPYb,d8  88  
+  88     ""     `Y8  I8[    ""    88     I8[    ""  a8"    `Y88  88  
+  88     ,adPPPPP88   `"Y8ba,     88      `"Y8ba,   8b       88  88  
+  88     88,    ,88  aa    ]8I    88,    aa    ]8I  "8a    ,d88  88  
+  88     `"8bbdP"Y8  `"YbbdP"'    "Y888  `"YbbdP"'   `"YbbdP'88  88  
+                                                             88      
+                                                             88      
+     
 ```
-常用工具类集合，方便使用，暂时分为 
-- core
-- fastsql
-- validation
-
-core 主要一些基础类型操作，例如格式转换，格式化，加密解密等常用类型工具集合
-
-fastsql 为一个简单的数据库工具类，可以简化 DB 操作，减少sql语句的书写，如果你不想使用hibernate，也不想写SQL可以使用
-
-validation 做一些常用参数校验，例如：非空、最大值、最小值、正则校验、长度校验、邮箱校验、空值校验等常用操作
 
 # fastsql
 

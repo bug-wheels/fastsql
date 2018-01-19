@@ -36,19 +36,24 @@ import java.util.Map;
 /**
  * The type Base repository.
  *
- * @author: 张瑀楠 zyndev@gmail.com
+ * @author 张瑀楠 zyndev@gmail.com
+ * @version 0.0.1
  */
 public class BaseRepositoryImpl implements BaseRepository {
 
-    private JdbcTemplate jdbcTemplate;
-
+    /**
+     * Save int.
+     *
+     * @param entity the entity
+     * @return the int
+     */
     @Override
     public int save(Object entity) {
         try {
             String tableName = AnnotationParser.getTableName(entity);
             System.out.println("tableName:" + tableName);
-            StringBuffer property = new StringBuffer();
-            StringBuffer value = new StringBuffer();
+            StringBuilder property = new StringBuilder();
+            StringBuilder value = new StringBuilder();
             List<Object> propertyValue = new ArrayList<Object>();
             List<DBColumnInfo> dbColumnInfos = AnnotationParser.getAllDBColumnInfo(entity);
 
@@ -78,17 +83,55 @@ public class BaseRepositoryImpl implements BaseRepository {
         return 0;
     }
 
+    /**
+     * Update int.
+     *
+     * @param entity the entity
+     * @return the int
+     */
     @Override
     public int update(Object entity) {
-        return update(entity, true);
+        return 0;
     }
 
+    /**
+     * Update int.
+     *
+     * @param entity  the entity
+     * @param columns the columns
+     * @return the int
+     */
+    @Override
+    public int update(Object entity, String... columns) {
+        return 0;
+    }
+
+    /**
+     * Update int.
+     *
+     * @param entity     the entity
+     * @param ignoreNull the ignore null
+     * @return the int
+     */
     @Override
     public int update(Object entity, boolean ignoreNull) {
+        return 0;
+    }
+
+    /**
+     * Update int.
+     *
+     * @param entity     the entity
+     * @param ignoreNull the ignore null
+     * @param columns    the columns
+     * @return the int
+     */
+    @Override
+    public int update(Object entity, boolean ignoreNull, String... columns) {
         try {
             String tableName = AnnotationParser.getTableName(entity);
-            StringBuffer property = new StringBuffer();
-            StringBuffer where = new StringBuffer();
+            StringBuilder property = new StringBuilder();
+            StringBuilder where = new StringBuilder();
             List<Object> propertyValue = new ArrayList<Object>();
             List<Object> wherePropertyValue = new ArrayList<Object>();
             List<DBColumnInfo> dbColumnInfos = AnnotationParser.getAllDBColumnInfo(entity);
@@ -112,10 +155,7 @@ public class BaseRepositoryImpl implements BaseRepository {
 
             String sql = "update "+tableName+ " set " +property.toString().substring(1) +" where "+ where.toString().substring(5);
             System.out.println(sql);
-            /*// log.info("update: "+sql);
-			// log.info("vaule: "+StringUtil.getArrayValue(propertyValue.toArray()));*/
-
-            // return this.getJdbcTemplate().update(sql, propertyValue.toArray());
+            return this.getJdbcTemplate().update(sql, propertyValue.toArray());
         } catch (Exception e) {
             e.printStackTrace();
             /*// log.error(StringUtil.outputException(e));*/
@@ -123,6 +163,12 @@ public class BaseRepositoryImpl implements BaseRepository {
         return 0;
     }
 
+    /**
+     * Delete int.
+     *
+     * @param entity the entity
+     * @return the int
+     */
     @Override
     public int delete(Object entity) {
         try {
@@ -156,13 +202,26 @@ public class BaseRepositoryImpl implements BaseRepository {
         return 0;
     }
 
+    /**
+     * Find by id e.
+     *
+     * @param entity the entity
+     * @return the e
+     */
     @Override
     public <E> E findById(E entity) {
         return findById(entity, null);
     }
 
+    /**
+     * Find by id e.
+     *
+     * @param entity  the entity
+     * @param columns the columns
+     * @return the e
+     */
     @Override
-    public <E> E findById(E entity, String columns) {
+    public <E> E findById(E entity, String... columns) {
         E result  =  null;
         boolean isExist = false;
         try {
@@ -184,19 +243,18 @@ public class BaseRepositoryImpl implements BaseRepository {
                 }
             }
             String sql = null;
-            if(columns == null || columns.length()==0){
+            if(columns == null || columns.length == 0){
                 sql = "select " + AnnotationParser.getTableAllColumn(entity) + " from  "+tableName+ " where "+ where.toString();
             }else{
                 sql = "select "+columns+"  from  "+tableName+ " where "+ where.toString();
             }
             //// log.info("getObjectById: "+sql);
 
-            SqlRowSet resultSet = this.jdbcTemplate.queryForRowSet(sql);
+            SqlRowSet resultSet = this.getJdbcTemplate().queryForRowSet(sql);
             Field[] fields = entity.getClass().getDeclaredFields();
             Map<String,String> map = new HashMap<String,String>();
-            if(columns!=null){
-                String[] tempStrings = columns.split(",");
-                for(String str: tempStrings){
+            if(columns != null){
+                for(String str: columns){
                     map.put(str.trim(), str.trim());
                 }
             }else{
@@ -224,8 +282,26 @@ public class BaseRepositoryImpl implements BaseRepository {
         return null;
     }
 
+    /**
+     * Gets entity list.
+     *
+     * @param entity the entity
+     * @return the entity list
+     */
     @Override
     public <E> List<E> getEntityList(E entity) {
+        return null;
+    }
+
+    /**
+     * Gets entity list.
+     *
+     * @param entity  the entity
+     * @param columns the columns
+     * @return the entity list
+     */
+    @Override
+    public <E> List<E> getEntityList(E entity, String... columns) {
         List<E> result = new ArrayList<>();
         try {
             Field[] fields = entity.getClass().getDeclaredFields();
@@ -252,10 +328,10 @@ public class BaseRepositoryImpl implements BaseRepository {
 
 
             if(propertyValue.size()>0){
-                resultSet  =   this.jdbcTemplate.queryForRowSet(sql,propertyValue.toArray());
+                resultSet  =   this.getJdbcTemplate().queryForRowSet(sql,propertyValue.toArray());
                 // log.info("getObjectById: "+sql);
             } else{
-                resultSet  =   this.jdbcTemplate.queryForRowSet(sql);
+                resultSet  =   this.getJdbcTemplate().queryForRowSet(sql);
                 // log.info("getObjectById: "+sql);
             }
 
@@ -280,4 +356,108 @@ public class BaseRepositoryImpl implements BaseRepository {
         }
         return result;
     }
+
+    /**
+     * Gets entity list.
+     *
+     * @param sql    the sql
+     * @param entity the entity
+     * @return the entity list
+     */
+    @Override
+    public <E> List<E> getEntityList(String sql, E entity) {
+        return null;
+    }
+
+    /**
+     * Gets entity list.
+     *
+     * @param sql    the sql
+     * @param args   the args
+     * @param entity the entity
+     * @return the entity list
+     */
+    @Override
+    public <E> List<E> getEntityList(String sql, Object[] args, E entity) {
+        return null;
+    }
+
+    /**
+     * Gets entity page list.
+     *
+     * @param entity   the entity
+     * @param pageNum  the page num
+     * @param pageSize the page size
+     * @return the entity page list
+     */
+    @Override
+    public <E> PageListContent<E> getEntityPageList(E entity, int pageNum, int pageSize) {
+        return null;
+    }
+
+    /**
+     * Gets entity page list.
+     *
+     * @param entity   the entity
+     * @param pageNum  the page num
+     * @param pageSize the page size
+     * @param columns  the columns
+     * @return the entity page list
+     */
+    @Override
+    public <E> PageListContent<E> getEntityPageList(E entity, int pageNum, int pageSize, String... columns) {
+        return null;
+    }
+
+    /**
+     * Gets entity page list by sql.
+     *
+     * @param sql      the sql
+     * @param entity   the entity
+     * @param pageNum  the page num
+     * @param pageSize the page size
+     * @param columns  the columns
+     * @return the entity page list by sql
+     */
+    @Override
+    public <E> PageListContent<E> getEntityPageListBySql(String sql, E entity, int pageNum, int pageSize, String... columns) {
+        return null;
+    }
+
+    /**
+     * Gets entity page list by sql.
+     *
+     * @param sql      the sql
+     * @param entity   the entity
+     * @param pageNum  the page num
+     * @param pageSize the page size
+     * @param orderBy  the order by
+     * @param columns  the columns
+     * @return the entity page list by sql
+     */
+    @Override
+    public <E> PageListContent<E> getEntityPageListBySql(String sql, E entity, int pageNum, int pageSize, String orderBy, String... columns) {
+        return null;
+    }
+
+    /**
+     * Gets entity page list by sql.
+     *
+     * @param sql      the sql
+     * @param args     the args
+     * @param entity   the entity
+     * @param pageNum  the page num
+     * @param pageSize the page size
+     * @param columns  the columns
+     * @return the entity page list by sql
+     */
+    @Override
+    public <E> PageListContent<E> getEntityPageListBySql(String sql, Object[] args, E entity, int pageNum, int pageSize, String... columns) {
+        return null;
+    }
+
+    private JdbcTemplate getJdbcTemplate() {
+        return DataSourceHolder.getJdbcTemplate();
+    }
+
 }
