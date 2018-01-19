@@ -132,8 +132,8 @@ public class BaseRepositoryImpl implements BaseRepository {
             String tableName = AnnotationParser.getTableName(entity);
             StringBuilder property = new StringBuilder();
             StringBuilder where = new StringBuilder();
-            List<Object> propertyValue = new ArrayList<Object>();
-            List<Object> wherePropertyValue = new ArrayList<Object>();
+            List<Object> propertyValue = new ArrayList<>();
+            List<Object> wherePropertyValue = new ArrayList<>();
             List<DBColumnInfo> dbColumnInfos = AnnotationParser.getAllDBColumnInfo(entity);
             for(DBColumnInfo dbColumnInfo : dbColumnInfos){
 
@@ -165,6 +165,7 @@ public class BaseRepositoryImpl implements BaseRepository {
 
     /**
      * Delete int.
+     * <p>根据id 删除对应的数据</p>
      *
      * @param entity the entity
      * @return the int
@@ -173,8 +174,8 @@ public class BaseRepositoryImpl implements BaseRepository {
     public int delete(Object entity) {
         try {
             String tableName = AnnotationParser.getTableName(entity);
-            StringBuffer where = new StringBuffer(" 1=1 ");
-            List<Object> whereValue = new ArrayList<>();
+            StringBuilder where = new StringBuilder(" 1=1 ");
+            List<Object> whereValue = new ArrayList<>(5);
             List<DBColumnInfo> dbColumnInfos = AnnotationParser.getAllDBColumnInfo(entity);
             for(DBColumnInfo dbColumnInfo : dbColumnInfos){
                 if (dbColumnInfo.isId()) {
@@ -182,22 +183,17 @@ public class BaseRepositoryImpl implements BaseRepository {
                     if (null != o) {
                         whereValue.add(o);
                     }
-                    where.append(" and `").append( dbColumnInfo.getColumnName()+"` = ? ");
+                    where.append(" and `").append(dbColumnInfo.getColumnName()).append("` = ? ");
                 }
             }
 
             if (whereValue.size() == 0) {
-                throw new RuntimeException("delete 时 id 无对应值，不能删除");
+                throw new IllegalStateException("delete " + tableName + " id 无对应值，不能删除");
             }
             String sql = "delete from  "+tableName+ " where "+ where.toString();
-            System.out.println(sql);
-            System.out.println("whereValue:" + whereValue);
-            /*// log.info("delete: "+sql);*/
-            // return this.getJdbcTemplate().update(sql);
-
+            return this.getJdbcTemplate().update(sql);
         } catch (Exception e) {
             e.printStackTrace();
-            //// log.error(StringUtil.outputException(e));
         }
         return 0;
     }
@@ -274,7 +270,6 @@ public class BaseRepositoryImpl implements BaseRepository {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            //// log.error(StringUtil.outputException(e));
         }
         if(isExist){
             return result;
