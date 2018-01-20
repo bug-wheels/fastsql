@@ -57,14 +57,13 @@ public class BaseRepositoryImpl implements BaseRepository {
             List<Object> propertyValue = new ArrayList<Object>();
             List<DBColumnInfo> dbColumnInfos = AnnotationParser.getAllDBColumnInfo(entity);
 
-            for(DBColumnInfo dbColumnInfo : dbColumnInfos){
-                // id 暂时不处理ID
-                if(dbColumnInfo.isId()){
+            for (DBColumnInfo dbColumnInfo : dbColumnInfos) {
+                if (dbColumnInfo.isId() || !dbColumnInfo.isInsertAble()) {
                     continue;
                 }
                 // 不为null
                 Object o = BeanReflectionUtil.getFieldValue(entity, dbColumnInfo.getFieldName());
-                if(o!=null){
+                if (o != null) {
                     property.append(",").append(dbColumnInfo.getColumnName());
                     value.append(",").append("?");
                     propertyValue.add(o);
@@ -75,7 +74,7 @@ public class BaseRepositoryImpl implements BaseRepository {
             System.out.println("value:" + value);
             System.out.println("propertyValue:" + propertyValue);
 
-            String sql = "insert into "+tableName+ "("+property.toString().substring(1)+") values("+value.toString().substring(1)+")";
+            String sql = "insert into " + tableName + "(" + property.toString().substring(1) + ") values(" + value.toString().substring(1) + ")";
             System.out.println(sql);
         } catch (Exception e) {
             e.printStackTrace();
@@ -91,7 +90,7 @@ public class BaseRepositoryImpl implements BaseRepository {
      */
     @Override
     public int update(Object entity) {
-        return 0;
+        return update(entity, true, null);
     }
 
     /**
@@ -103,7 +102,7 @@ public class BaseRepositoryImpl implements BaseRepository {
      */
     @Override
     public int update(Object entity, String... columns) {
-        return 0;
+        return update(entity, true, columns);
     }
 
     /**
@@ -115,7 +114,7 @@ public class BaseRepositoryImpl implements BaseRepository {
      */
     @Override
     public int update(Object entity, boolean ignoreNull) {
-        return 0;
+        return update(entity, ignoreNull, null);
     }
 
     /**
@@ -135,14 +134,13 @@ public class BaseRepositoryImpl implements BaseRepository {
             List<Object> propertyValue = new ArrayList<>();
             List<Object> wherePropertyValue = new ArrayList<>();
             List<DBColumnInfo> dbColumnInfos = AnnotationParser.getAllDBColumnInfo(entity);
-            for(DBColumnInfo dbColumnInfo : dbColumnInfos){
+            for (DBColumnInfo dbColumnInfo : dbColumnInfos) {
 
                 Object o = BeanReflectionUtil.getFieldValue(entity, dbColumnInfo.getFieldName());
-                if(dbColumnInfo.isId()){
-                    where.append(" and ");
-                    where.append(dbColumnInfo.getColumnName()+" = ? ");
+                if (dbColumnInfo.isId()) {
+                    where.append(" and ").append(dbColumnInfo.getColumnName()).append(" = ? ");
                     wherePropertyValue.add(o);
-                } else if(ignoreNull || o != null){
+                } else if (ignoreNull || o != null) {
                     property.append(",").append(dbColumnInfo.getColumnName()).append("=?");
                     propertyValue.add(o);
                 }
@@ -153,7 +151,7 @@ public class BaseRepositoryImpl implements BaseRepository {
             System.out.println("propertyValue:" + propertyValue);
             System.out.println("wherePropertyValue:" + wherePropertyValue);
 
-            String sql = "update "+tableName+ " set " +property.toString().substring(1) +" where "+ where.toString().substring(5);
+            String sql = "update " + tableName + " set " + property.toString().substring(1) + " where " + where.toString().substring(5);
             System.out.println(sql);
             return this.getJdbcTemplate().update(sql, propertyValue.toArray());
         } catch (Exception e) {
@@ -177,7 +175,7 @@ public class BaseRepositoryImpl implements BaseRepository {
             StringBuilder where = new StringBuilder(" 1=1 ");
             List<Object> whereValue = new ArrayList<>(5);
             List<DBColumnInfo> dbColumnInfos = AnnotationParser.getAllDBColumnInfo(entity);
-            for(DBColumnInfo dbColumnInfo : dbColumnInfos){
+            for (DBColumnInfo dbColumnInfo : dbColumnInfos) {
                 if (dbColumnInfo.isId()) {
                     Object o = BeanReflectionUtil.getFieldValue(entity, dbColumnInfo.getFieldName());
                     if (null != o) {
@@ -190,7 +188,7 @@ public class BaseRepositoryImpl implements BaseRepository {
             if (whereValue.size() == 0) {
                 throw new IllegalStateException("delete " + tableName + " id 无对应值，不能删除");
             }
-            String sql = "delete from  "+tableName+ " where "+ where.toString();
+            String sql = "delete from  " + tableName + " where " + where.toString();
             return this.getJdbcTemplate().update(sql);
         } catch (Exception e) {
             e.printStackTrace();
@@ -218,18 +216,19 @@ public class BaseRepositoryImpl implements BaseRepository {
      */
     @Override
     public <E> E findById(E entity, String... columns) {
-        E result  =  null;
+        E result = null;
         boolean isExist = false;
         try {
+            //noinspection unchecked
             result = (E) BeanReflectionUtil.newInstance(entity.getClass().getName());
             Object tableName = AnnotationParser.getTableName(entity);
-            StringBuffer where = new StringBuffer(100);
+            StringBuilder where = new StringBuilder(100);
             List<Object> whereValue = new ArrayList<>();
             where.append(" 1=1 ");
             List<DBColumnInfo> dbColumnInfos = AnnotationParser.getAllDBColumnInfo(entity);
-            for(DBColumnInfo dbColumnInfo : dbColumnInfos ){
+            for (DBColumnInfo dbColumnInfo : dbColumnInfos) {
                 if (dbColumnInfo.isId()) {
-                    where.append(" and ").append( dbColumnInfo.getColumnName()+"= ? ");
+                    where.append(" and ").append(dbColumnInfo.getColumnName()).append("= ? ");
                     Object o = BeanReflectionUtil.getFieldValue(entity, dbColumnInfo.getColumnName());
                     if (null == o) {
                         throw new RuntimeException("根据ID查询，where 条件为空");
@@ -239,30 +238,30 @@ public class BaseRepositoryImpl implements BaseRepository {
                 }
             }
             String sql = null;
-            if(columns == null || columns.length == 0){
-                sql = "select " + AnnotationParser.getTableAllColumn(entity) + " from  "+tableName+ " where "+ where.toString();
-            }else{
-                sql = "select "+columns+"  from  "+tableName+ " where "+ where.toString();
+            if (columns == null || columns.length == 0) {
+                sql = "select " + AnnotationParser.getTableAllColumn(entity) + " from  " + tableName + " where " + where.toString();
+            } else {
+                sql = "select " + columns + "  from  " + tableName + " where " + where.toString();
             }
             //// log.info("getObjectById: "+sql);
 
-            SqlRowSet resultSet = this.getJdbcTemplate().queryForRowSet(sql);
+            SqlRowSet resultSet = this.getJdbcTemplate().queryForRowSet(sql, whereValue);
             Field[] fields = entity.getClass().getDeclaredFields();
-            Map<String,String> map = new HashMap<String,String>();
-            if(columns != null){
-                for(String str: columns){
+            Map<String, String> map = new HashMap<>();
+            if (columns != null) {
+                for (String str : columns) {
                     map.put(str.trim(), str.trim());
                 }
-            }else{
-                for(DBColumnInfo dbColumnInfo : dbColumnInfos){
+            } else {
+                for (DBColumnInfo dbColumnInfo : dbColumnInfos) {
                     map.put(dbColumnInfo.getColumnName(), dbColumnInfo.getColumnName());
                 }
             }
-            while(resultSet.next()){
+            while (resultSet.next()) {
                 isExist = true;
-                for(Field field : fields){
+                for (Field field : fields) {
                     //表字段存在才有意义
-                    if(map.get(field.getName())!=null){
+                    if (map.get(field.getName()) != null) {
                         field.setAccessible(true);
                         field.set(result, resultSet.getObject(field.getName()));
                     }
@@ -271,7 +270,7 @@ public class BaseRepositoryImpl implements BaseRepository {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(isExist){
+        if (isExist) {
             return result;
         }
         return null;
@@ -285,7 +284,7 @@ public class BaseRepositoryImpl implements BaseRepository {
      */
     @Override
     public <E> List<E> getEntityList(E entity) {
-        return null;
+        return getEntityList(entity, null);
     }
 
     /**
@@ -302,43 +301,36 @@ public class BaseRepositoryImpl implements BaseRepository {
             Field[] fields = entity.getClass().getDeclaredFields();
             Object tableName = AnnotationParser.getTableName(entity);
             StringBuilder where = new StringBuilder();
-            List<Object> propertyValue = new ArrayList<Object>();
+            List<Object> propertyValue = new ArrayList<>();
             List<DBColumnInfo> dbColumnInfos = AnnotationParser.getAllDBColumnInfo(entity);
-            for(DBColumnInfo dbColumnInfo : dbColumnInfos){
+            for (DBColumnInfo dbColumnInfo : dbColumnInfos) {
                 Object o = BeanReflectionUtil.getFieldValue(entity, dbColumnInfo.getColumnName());
                 if (o != null && !"".equals(o.toString())) {
                     where.append(" and ").append(dbColumnInfo.getColumnName()).append(" =?");
                     propertyValue.add(o);
                 }
             }
-            String sql =  null;
-            SqlRowSet resultSet  = null;
+            String sql = null;
 
             //带条件的查询
-            if(propertyValue.size()>0){
-                sql = "select "+ AnnotationParser.getTableAllColumn(entity) +"  from  "+tableName+ " where "+ where.toString().substring(4);
-            } else{
-                sql = "select "+ AnnotationParser.getTableAllColumn(entity) +"   from  "+tableName;
+            if (propertyValue.size() > 0) {
+                sql = "select " + AnnotationParser.getTableAllColumn(entity) + " from  " + tableName + " where " + where.toString().substring(4);
+            } else {
+                sql = "select " + AnnotationParser.getTableAllColumn(entity) + "  from  " + tableName;
             }
 
+            SqlRowSet resultSet = this.getJdbcTemplate().queryForRowSet(sql, propertyValue.toArray());
 
-            if(propertyValue.size()>0){
-                resultSet  =   this.getJdbcTemplate().queryForRowSet(sql,propertyValue.toArray());
-                // log.info("getObjectById: "+sql);
-            } else{
-                resultSet  =   this.getJdbcTemplate().queryForRowSet(sql);
-                // log.info("getObjectById: "+sql);
-            }
-
-            Map<String,String> map = new HashMap<String,String>();
-            for(DBColumnInfo dbColumnInfo : dbColumnInfos ){
+            Map<String, String> map = new HashMap<String, String>();
+            for (DBColumnInfo dbColumnInfo : dbColumnInfos) {
                 map.put(dbColumnInfo.getColumnName(), dbColumnInfo.getColumnName());
             }
 
-            while(resultSet.next()){
+            while (resultSet.next()) {
+                @SuppressWarnings("unchecked")
                 E temp = (E) BeanReflectionUtil.newInstance(entity.getClass().getName());
-                for(Field field : fields){
-                    if(map.get(field.getName())!=null){
+                for (Field field : fields) {
+                    if (map.get(field.getName()) != null) {
                         field.setAccessible(true);
                         field.set(temp, resultSet.getObject(field.getName()));
                     }
@@ -361,7 +353,7 @@ public class BaseRepositoryImpl implements BaseRepository {
      */
     @Override
     public <E> List<E> getEntityList(String sql, E entity) {
-        return null;
+        return getEntityList(sql, null, entity);
     }
 
     /**
@@ -374,8 +366,29 @@ public class BaseRepositoryImpl implements BaseRepository {
      */
     @Override
     public <E> List<E> getEntityList(String sql, Object[] args, E entity) {
-        return null;
+        List<E> list = new ArrayList<>();
+        try {
+            SqlRowSet result  =  this.getJdbcTemplate().queryForRowSet(sql, args);
+            Map<String,String> map = new HashMap<>();
+            //obj 获得字段
+            Field[] fields = BeanReflectionUtil.getBeanDeclaredFields(entity.getClass().getName());
+            while(result.next()){
+                @SuppressWarnings("unchecked")
+                E temp = (E) BeanReflectionUtil.newInstance(entity.getClass().getName());
+                for(Field field : fields){
+                    if(map.get(field.getName())!=null){
+                        field.setAccessible(true);
+                        field.set(temp, result.getObject(field.getName()));
+                    }
+                }
+                list.add(temp);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
     }
+
 
     /**
      * Gets entity page list.
