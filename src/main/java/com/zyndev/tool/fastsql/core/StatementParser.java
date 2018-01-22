@@ -46,8 +46,6 @@ import java.util.Map;
 
 /**
  * sql 语句解析
- * <p>
- * 暂时只能处理 select count(*) from tb_user 类似语句
  *
  * @author 张瑀楠 zyndev@gmail.com
  * @version 0.0.1
@@ -72,7 +70,7 @@ class StatementParser {
      */
     static Object invoke(Object proxy, Method method, Object[] args) throws Exception {
 
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSourceHolder.getInstance().getDataSource());
+        JdbcTemplate jdbcTemplate = DataSourceHolder.getInstance().getJdbcTemplate();
 
         boolean logDebug = logger.isDebugEnabled();
 

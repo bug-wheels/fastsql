@@ -55,7 +55,7 @@ class DBColumnInfo {
     /**
      * Whether the column is included in SQL INSERT
      */
-    private boolean insertAble = true;
+    private boolean insertable = true;
 
     /**
      * Whether the column is included in SQL UPDATE

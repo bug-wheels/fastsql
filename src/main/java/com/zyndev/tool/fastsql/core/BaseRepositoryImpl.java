@@ -51,14 +51,13 @@ public class BaseRepositoryImpl implements BaseRepository {
     public int save(Object entity) {
         try {
             String tableName = AnnotationParser.getTableName(entity);
-            System.out.println("tableName:" + tableName);
             StringBuilder property = new StringBuilder();
             StringBuilder value = new StringBuilder();
-            List<Object> propertyValue = new ArrayList<Object>();
+            List<Object> propertyValue = new ArrayList<>();
             List<DBColumnInfo> dbColumnInfos = AnnotationParser.getAllDBColumnInfo(entity);
 
             for (DBColumnInfo dbColumnInfo : dbColumnInfos) {
-                if (dbColumnInfo.isId() || !dbColumnInfo.isInsertAble()) {
+                if (dbColumnInfo.isId() || !dbColumnInfo.isInsertable()) {
                     continue;
                 }
                 // 不为null
@@ -70,12 +69,8 @@ public class BaseRepositoryImpl implements BaseRepository {
                 }
             }
 
-            System.out.println("property:" + property);
-            System.out.println("value:" + value);
-            System.out.println("propertyValue:" + propertyValue);
-
             String sql = "insert into " + tableName + "(" + property.toString().substring(1) + ") values(" + value.toString().substring(1) + ")";
-            System.out.println(sql);
+            return this.getJdbcTemplate().update(sql, propertyValue.toArray());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -146,17 +141,12 @@ public class BaseRepositoryImpl implements BaseRepository {
                 }
             }
 
-            System.out.println("property:" + property);
-            System.out.println("where:" + where);
-            System.out.println("propertyValue:" + propertyValue);
-            System.out.println("wherePropertyValue:" + wherePropertyValue);
+            propertyValue.addAll(wherePropertyValue);
 
             String sql = "update " + tableName + " set " + property.toString().substring(1) + " where " + where.toString().substring(5);
-            System.out.println(sql);
             return this.getJdbcTemplate().update(sql, propertyValue.toArray());
         } catch (Exception e) {
             e.printStackTrace();
-            /*// log.error(StringUtil.outputException(e));*/
         }
         return 0;
     }
@@ -180,8 +170,8 @@ public class BaseRepositoryImpl implements BaseRepository {
                     Object o = BeanReflectionUtil.getFieldValue(entity, dbColumnInfo.getFieldName());
                     if (null != o) {
                         whereValue.add(o);
+                        where.append(" and `").append(dbColumnInfo.getColumnName()).append("` = ? ");
                     }
-                    where.append(" and `").append(dbColumnInfo.getColumnName()).append("` = ? ");
                 }
             }
 
@@ -189,7 +179,7 @@ public class BaseRepositoryImpl implements BaseRepository {
                 throw new IllegalStateException("delete " + tableName + " id 无对应值，不能删除");
             }
             String sql = "delete from  " + tableName + " where " + where.toString();
-            return this.getJdbcTemplate().update(sql);
+            return this.getJdbcTemplate().update(sql, whereValue);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -243,7 +233,6 @@ public class BaseRepositoryImpl implements BaseRepository {
             } else {
                 sql = "select " + columns + "  from  " + tableName + " where " + where.toString();
             }
-            //// log.info("getObjectById: "+sql);
 
             SqlRowSet resultSet = this.getJdbcTemplate().queryForRowSet(sql, whereValue);
             Field[] fields = entity.getClass().getDeclaredFields();
@@ -465,7 +454,7 @@ public class BaseRepositoryImpl implements BaseRepository {
     }
 
     private JdbcTemplate getJdbcTemplate() {
-        return DataSourceHolder.getJdbcTemplate();
+        return DataSourceHolder.getInstance().getJdbcTemplate();
     }
 
 }
