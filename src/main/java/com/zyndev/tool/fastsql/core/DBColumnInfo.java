@@ -25,6 +25,9 @@ package com.zyndev.tool.fastsql.core;
 
 import lombok.Data;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+
 /**
  * The type Db column info.
  *
@@ -33,6 +36,14 @@ import lombok.Data;
  */
 @Data
 class DBColumnInfo {
+
+    /**
+     * (Optional) The primary key generation strategy
+     * that the persistence provider must use to
+     * generate the annotated entity primary key.
+     */
+    private GenerationType strategy = GenerationType.AUTO;
+
 
     private String fieldName;
 
