@@ -54,10 +54,10 @@ public class BaseRepositoryImpl implements BaseRepository {
             StringBuilder property = new StringBuilder();
             StringBuilder value = new StringBuilder();
             List<Object> propertyValue = new ArrayList<>();
-            List<DBColumnInfo> dbColumnInfos = AnnotationParser.getAllDBColumnInfo(entity);
+            List<DBColumnInfo> dbColumnInfoList = AnnotationParser.getAllDBColumnInfo(entity);
 
-            for (DBColumnInfo dbColumnInfo : dbColumnInfos) {
-                if (dbColumnInfo.isId() || !dbColumnInfo.isInsertable()) {
+            for (DBColumnInfo dbColumnInfo : dbColumnInfoList) {
+                if (dbColumnInfo.isId() || !dbColumnInfo.isInsertAble()) {
                     continue;
                 }
                 // 不为null
@@ -68,7 +68,6 @@ public class BaseRepositoryImpl implements BaseRepository {
                     propertyValue.add(o);
                 }
             }
-
             String sql = "insert into " + tableName + "(" + property.toString().substring(1) + ") values(" + value.toString().substring(1) + ")";
             return this.getJdbcTemplate().update(sql, propertyValue.toArray());
         } catch (Exception e) {
@@ -141,9 +140,12 @@ public class BaseRepositoryImpl implements BaseRepository {
                 }
             }
 
-            propertyValue.addAll(wherePropertyValue);
+            if (wherePropertyValue.isEmpty()) {
+                throw new IllegalArgumentException("更新表 [" + tableName + "] 无法找到id, 请求数据：" + entity);
+            }
 
             String sql = "update " + tableName + " set " + property.toString().substring(1) + " where " + where.toString().substring(5);
+            propertyValue.addAll(wherePropertyValue);
             return this.getJdbcTemplate().update(sql, propertyValue.toArray());
         } catch (Exception e) {
             e.printStackTrace();
