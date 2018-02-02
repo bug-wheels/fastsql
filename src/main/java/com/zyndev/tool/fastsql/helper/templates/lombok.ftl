@@ -13,7 +13,7 @@ import java.util.Date;
  * ${tableColumn}
  *
  * @author 张瑀楠 zyndev@gmail.com
- * @version 1.0
+ * @version 0.0.1
  * @date ${createDate?string("yyyy-MM-dd HH:mm:ss")}
  */
 @Getter

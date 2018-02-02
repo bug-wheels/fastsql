@@ -1,26 +1,3 @@
-/*
- * The MIT License (MIT)
- *
- * Copyright (c) 2017 zyndev zyndev@gmail.com
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
-
 package com.zyndev.tool.fastsql.helper;
 
 import com.mysql.jdbc.DatabaseMetaData;
@@ -37,19 +14,25 @@ import java.util.*;
 import java.util.Date;
 
 /**
- * The type Auto generate entity of my sql.
+ * @author 张瑀楠 zyndev@gmail.com
+ * @version 0.0.1
+ * @since 2018/1/22 下午9:54
  */
-public class AutoGenerateEntityOfMySQL {
+public class ConvertMySqlToBean {
 
     /**
      * The Pstmt.
      */
-    PreparedStatement pstmt = null;
+    private PreparedStatement pstmt = null;
 
     // 数据库连接
-    private static Connection connection;
-    private static String db_name = "springcloud";
-    private static String filePath = "D:\\[]model\\";
+    private Connection connection;
+
+    private String dbName;
+    private String filePath;
+    private String url;
+    private String userName;
+    private String password;
 
     // 查询数据库 对应的表注释
     private static String queryTableComment = "SELECT TABLE_COMMENT FROM information_schema.`TABLES` WHERE table_name = ? AND table_schema = ? ";
@@ -57,14 +40,15 @@ public class AutoGenerateEntityOfMySQL {
     // 查询数据库 对应的字段信息
     private static String queryDataTableInfo = "select COLUMN_NAME,COLUMN_KEY,IS_NULLABLE,DATA_TYPE,COLUMN_COMMENT from information_schema.COLUMNS where table_name = ? and table_schema = ?";
 
-    /**
-     * The entry point of application.
-     *
-     * @param args the input arguments
-     * @throws SQLException the sql exception
-     * @throws IOException  the io exception
-     */
-    public static void main(String[] args) throws SQLException, IOException {
+    public ConvertMySqlToBean(ConnectionInfo connectionInfo) {
+        this.dbName = connectionInfo.getDbName();
+        this.filePath = connectionInfo.getFilePath();
+        this.url = connectionInfo.getUrl();
+        this.userName = connectionInfo.getUserName();
+        this.password = connectionInfo.getPassword();
+    }
+
+    public void createBeans() throws SQLException, IOException {
         List<String> tables = getMySqlDataBaseTable();
         int tableCount = tables.size();
         for (int index = 0; index < tableCount; ++index) {
@@ -72,27 +56,27 @@ public class AutoGenerateEntityOfMySQL {
         }
     }
 
-    private synchronized static void convertMySqlTableToJavaEntity(String tableName, int index) throws SQLException, IOException {
-        Configuration cfg = new Configuration();
+    private synchronized void convertMySqlTableToJavaEntity(String tableName, int index) throws SQLException, IOException {
+        Configuration cfg = new Configuration(new Version("2.3.23"));
 
         cfg.setTemplateLoader(new ClassTemplateLoader(TableInfo.class, "./templates/"));
 
         // 设置对象包装器
-        cfg.setObjectWrapper(new DefaultObjectWrapper());
+        cfg.setObjectWrapper(new DefaultObjectWrapper(new Version("2.3.23")));
 
         // 设置异常处理器
         cfg.setTemplateExceptionHandler(TemplateExceptionHandler.IGNORE_HANDLER);
 
         PreparedStatement queryTableCommentPreparedStatement = getConnection().prepareStatement(queryTableComment);
         queryTableCommentPreparedStatement.setString(1, tableName);
-        queryTableCommentPreparedStatement.setString(2, db_name);
+        queryTableCommentPreparedStatement.setString(2, dbName);
         ResultSet tableRet = queryTableCommentPreparedStatement.executeQuery();
         tableRet.next();
         String tableColumn = tableRet.getString("TABLE_COMMENT");
 
         PreparedStatement preparedStatement = getConnection().prepareStatement(queryDataTableInfo);
         preparedStatement.setString(1, tableName);
-        preparedStatement.setString(2, db_name);
+        preparedStatement.setString(2, dbName);
         ResultSet colRet = preparedStatement.executeQuery();
 
         String rate = "";
@@ -121,6 +105,7 @@ public class AutoGenerateEntityOfMySQL {
             ColumnInfo columnInfo = new ColumnInfo();
             columnInfoList.add(columnInfo);
             columnInfo.setColumn(columnName);
+            // columnInfo.setNullable();
             columnInfo.setId("PRI".equals(columnKey));
             columnInfo.setType(convertSqlTypeToJavaType(dataType));
             columnInfo.setName(convertColumnName(columnName));
@@ -131,7 +116,7 @@ public class AutoGenerateEntityOfMySQL {
 
         // 定义模板解释完成之后的输出
         PrintWriter out = new PrintWriter(new BufferedWriter(
-                new FileWriter(filePath + initCap(tableName) +  ".java")));
+                new FileWriter(this.filePath + initCap(tableName) +  ".java")));
 //
         try {
             // 解释模板
@@ -147,11 +132,11 @@ public class AutoGenerateEntityOfMySQL {
      * @return
      * @throws SQLException
      */
-    private static ArrayList<String> getMySqlDataBaseTable() throws SQLException {
+    private ArrayList<String> getMySqlDataBaseTable() throws SQLException {
         System.out.println("------conn--------" + getConnection());
         System.out.println("------conn.getAutoCommit()--------" + getConnection().getAutoCommit());
         // 查找指定数据库的所有 Table
-        ArrayList<String> tables = new ArrayList<String>();
+        ArrayList<String> tables = new ArrayList<>();
         DatabaseMetaData dbmd = (DatabaseMetaData) getConnection().getMetaData();
         ResultSet rs = null;
         String[] typeList = new String[] { "TABLE"};
@@ -206,14 +191,14 @@ public class AutoGenerateEntityOfMySQL {
      * @return connection
      * @throws SQLException the sql exception
      */
-    public static Connection getConnection() throws SQLException {
+    public Connection getConnection() throws SQLException {
         if (connection == null) {
             try {
                 Class.forName("com.mysql.jdbc.Driver");
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/springcloud?useUnicode=true&characterEncoding=utf8", "root", "zyndev");
+            connection = DriverManager.getConnection(url, userName, password);
         }
         connection.setAutoCommit(false);
         return connection;
@@ -279,4 +264,6 @@ public class AutoGenerateEntityOfMySQL {
         }
         return result.toString();
     }
+
+
 }
