@@ -3,7 +3,7 @@
 
     <groupId>com.github.zyndev</groupId>
     <artifactId>fastsql</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
     <modelVersion>4.0.0</modelVersion>
 
     <packaging>jar</packaging>
@@ -38,6 +38,10 @@
     <developers>
         <developer>
             <name>zyndev</name>
+            <email>zyndev@gmail.com</email>
+        </developer>
+        <developer>
+            <name>777</name>
             <email>zyndev@gmail.com</email>
         </developer>
     </developers>
