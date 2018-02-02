@@ -73,12 +73,12 @@ public class AutoGenerateEntityOfMySQL {
     }
 
     private synchronized static void convertMySqlTableToJavaEntity(String tableName, int index) throws SQLException, IOException {
-        Configuration cfg = new Configuration();
+        Configuration cfg = new Configuration(new Version("2.3.23"));
 
         cfg.setTemplateLoader(new ClassTemplateLoader(TableInfo.class, "./templates/"));
 
         // 设置对象包装器
-        cfg.setObjectWrapper(new DefaultObjectWrapper());
+        cfg.setObjectWrapper(new DefaultObjectWrapper(new Version("2.3.23")));
 
         // 设置异常处理器
         cfg.setTemplateExceptionHandler(TemplateExceptionHandler.IGNORE_HANDLER);
