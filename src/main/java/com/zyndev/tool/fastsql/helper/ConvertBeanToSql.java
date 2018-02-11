@@ -91,7 +91,7 @@ public class ConvertBeanToSql {
      */
     public Set<Class<?>> filterEntityClass() throws IOException, ClassNotFoundException {
         ClassScanner classScanner = new ClassScanner();
-        Set<Class<?>> classes = classScanner.getPackageAllClasses("com.zyndev.tool.fastsql", true);
+        Set<Class<?>> classes = classScanner.getPackageAllClasses("com.zyndev", true);
         Set<Class<?>> result = new HashSet<>(40);
         for (Class clazz : classes) {
             if (null != clazz.getAnnotation(Entity.class)) {
@@ -126,21 +126,23 @@ public class ConvertBeanToSql {
         tableInfo.setColumnInfoList(columnInfoList);
         for (Field field : fields) {
             Column column = field.getAnnotation(Column.class);
-            if (null == column) {
-                continue;
-            }
+//            if (null == column) {
+//                continue;
+//            }
             ColumnInfo columnInfo = new ColumnInfo();
-            if (StringUtil.isNotBlank(column.name())) {
-                columnInfo.setColumn(column.name());
-            } else {
-                columnInfo.setColumn(field.getName());
-            }
+//            if (StringUtil.isNotBlank(column.name())) {
+//                columnInfo.setColumn(column.name());
+//            } else {
+//                columnInfo.setColumn(field.getName());
+//            }
+            columnInfo.setColumn(field.getName());
+
             Id id = field.getAnnotation(Id.class);
             if (null != id) {
                 columnInfo.setId(true);
             }
             columnInfo.setComment("ghost know the means of field");
-            columnInfo.setType(convertJavaTypeToSQLType(field.getType().getName(), column.length()));
+            columnInfo.setType(convertJavaTypeToSQLType(field.getType().getName(), 50));
             columnInfoList.add(columnInfo);
         }
 

@@ -27,6 +27,7 @@ import com.zyndev.tool.fastsql.util.BeanReflectionUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
+import javax.sql.DataSource;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,7 +58,7 @@ public class BaseRepositoryImpl implements BaseRepository {
             List<DBColumnInfo> dbColumnInfoList = AnnotationParser.getAllDBColumnInfo(entity);
 
             for (DBColumnInfo dbColumnInfo : dbColumnInfoList) {
-                if (dbColumnInfo.isId() || !dbColumnInfo.isInsertAble()) {
+                if (dbColumnInfo.isId() || !dbColumnInfo.isInsertable()) {
                     continue;
                 }
                 // 不为null
@@ -69,7 +70,7 @@ public class BaseRepositoryImpl implements BaseRepository {
                 }
             }
             String sql = "insert into " + tableName + "(" + property.toString().substring(1) + ") values(" + value.toString().substring(1) + ")";
-            return this.getJdbcTemplate().update(sql, propertyValue.toArray());
+            return this.jdbcTemplate.update(sql, propertyValue.toArray());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -146,7 +147,7 @@ public class BaseRepositoryImpl implements BaseRepository {
 
             String sql = "update " + tableName + " set " + property.toString().substring(1) + " where " + where.toString().substring(5);
             propertyValue.addAll(wherePropertyValue);
-            return this.getJdbcTemplate().update(sql, propertyValue.toArray());
+            return this.jdbcTemplate.update(sql, propertyValue.toArray());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -181,7 +182,7 @@ public class BaseRepositoryImpl implements BaseRepository {
                 throw new IllegalStateException("delete " + tableName + " id 无对应值，不能删除");
             }
             String sql = "delete from  " + tableName + " where " + where.toString();
-            return this.getJdbcTemplate().update(sql, whereValue);
+            return this.jdbcTemplate.update(sql, whereValue);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -236,7 +237,7 @@ public class BaseRepositoryImpl implements BaseRepository {
                 sql = "select " + columns + "  from  " + tableName + " where " + where.toString();
             }
 
-            SqlRowSet resultSet = this.getJdbcTemplate().queryForRowSet(sql, whereValue);
+            SqlRowSet resultSet = this.jdbcTemplate.queryForRowSet(sql, whereValue);
             Field[] fields = entity.getClass().getDeclaredFields();
             Map<String, String> map = new HashMap<>();
             if (columns != null) {
@@ -310,7 +311,7 @@ public class BaseRepositoryImpl implements BaseRepository {
                 sql = "select " + AnnotationParser.getTableAllColumn(entity) + "  from  " + tableName;
             }
 
-            SqlRowSet resultSet = this.getJdbcTemplate().queryForRowSet(sql, propertyValue.toArray());
+            SqlRowSet resultSet = this.jdbcTemplate.queryForRowSet(sql, propertyValue.toArray());
 
             Map<String, String> map = new HashMap<String, String>();
             for (DBColumnInfo dbColumnInfo : dbColumnInfos) {
@@ -359,7 +360,7 @@ public class BaseRepositoryImpl implements BaseRepository {
     public <E> List<E> getEntityList(String sql, Object[] args, E entity) {
         List<E> list = new ArrayList<>();
         try {
-            SqlRowSet result  =  this.getJdbcTemplate().queryForRowSet(sql, args);
+            SqlRowSet result  =  this.jdbcTemplate.queryForRowSet(sql, args);
             Map<String,String> map = new HashMap<>();
             //obj 获得字段
             Field[] fields = BeanReflectionUtil.getBeanDeclaredFields(entity.getClass().getName());
@@ -455,8 +456,11 @@ public class BaseRepositoryImpl implements BaseRepository {
         return null;
     }
 
-    private JdbcTemplate getJdbcTemplate() {
-        return DataSourceHolder.getInstance().getJdbcTemplate();
+
+    private JdbcTemplate jdbcTemplate;
+
+    public void setJdbcTemplate(DataSource dataSource) {
+        jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
 }
