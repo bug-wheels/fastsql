@@ -5,10 +5,9 @@ import org.junit.Test;
 /**
  * 这里应该有描述
  *
- * @author 张瑀楠 wb.yunan.zhang@renren-inc.com
+ * @author 张瑀楠 zyndev@gmail.com
  * @version 1.0
  * @date 2018/2/22 13:59
- * TODO:
  */
 public class PatternTest {
 
