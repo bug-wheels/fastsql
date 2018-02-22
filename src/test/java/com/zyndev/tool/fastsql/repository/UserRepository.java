@@ -2,6 +2,7 @@ package com.zyndev.tool.fastsql.repository;
 
 import com.zyndev.tool.fastsql.annotation.Param;
 import com.zyndev.tool.fastsql.annotation.Query;
+import com.zyndev.tool.fastsql.annotation.ReturnGeneratedKey;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -40,6 +41,11 @@ public interface UserRepository {
     @Query("insert into tb_user(id, account_name, password, uid, nick_name, register_time, update_time) " +
             "values(:id, :user.accountName, :user.password, :user.uid, :user.nickName, :user.registerTime, :user.updateTime )")
     public int saveUser(@Param("id") Integer id, @Param("user") User user);
+
+    @ReturnGeneratedKey
+    @Query("insert into tb_user(account_name, password, uid, nick_name, register_time, update_time) " +
+            "values(:user.accountName, :user.password, :user.uid, :user.nickName, :user.registerTime, :user.updateTime )")
+    public int saveUser(@Param("user") User user);
 
     @Query("select * " +
             " from tb_user " +

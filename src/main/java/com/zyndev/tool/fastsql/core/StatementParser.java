@@ -23,8 +23,10 @@
 
 package com.zyndev.tool.fastsql.core;
 
+import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import com.zyndev.tool.fastsql.annotation.Param;
 import com.zyndev.tool.fastsql.annotation.Query;
+import com.zyndev.tool.fastsql.annotation.ReturnGeneratedKey;
 import com.zyndev.tool.fastsql.convert.BeanConvert;
 import com.zyndev.tool.fastsql.convert.ListConvert;
 import com.zyndev.tool.fastsql.convert.SetConvert;
@@ -32,7 +34,9 @@ import com.zyndev.tool.fastsql.util.BeanReflectionUtil;
 import com.zyndev.tool.fastsql.util.StringUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.*;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -40,6 +44,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +64,37 @@ import java.util.Map;
 class StatementParser {
 
     private final static Log logger = LogFactory.getLog(StatementParser.class);
+
+    private static PreparedStatementCreator getPreparedStatementCreator(final String sql, final Object[] args, final boolean returnKeys) {
+        PreparedStatementCreator creator = new PreparedStatementCreator() {
+
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement ps = con.prepareStatement(sql);
+                if (returnKeys) {
+                    ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                } else {
+                    ps = con.prepareStatement(sql);
+                }
+
+                if (args != null) {
+                    for (int i = 0; i < args.length; i++) {
+                        Object arg = args[i];
+                        if (arg instanceof SqlParameterValue) {
+                            SqlParameterValue paramValue = (SqlParameterValue) arg;
+                            StatementCreatorUtils.setParameterValue(ps, i + 1, paramValue,
+                                    paramValue.getValue());
+                        } else {
+                            StatementCreatorUtils.setParameterValue(ps, i + 1,
+                                    SqlTypeValue.TYPE_UNKNOWN, arg);
+                        }
+                    }
+                }
+                return ps;
+            }
+        };
+        return creator;
+    }
 
     /**
      * 此处对 Repository 中方法进行解析，解析成对应的sql 和 参数
@@ -140,17 +179,13 @@ class StatementParser {
 
 
         System.out.println("execute sql:" + originSql);
-        System.out.println("params : ------------------------------------------");
+        System.out.print("params : ");
         if (null != params) {
             for (Object o : params) {
-                if (null != o) {
-                    System.out.print(o.toString() + ",\t");
-                } else {
-                    System.out.print("null,\t");
-                }
+                System.out.print(o + ",\t");
             }
-            System.out.println("\n");
         }
+        System.out.println("\n");
 
 
         /**
@@ -186,11 +221,25 @@ class StatementParser {
                 return BeanConvert.convert(rowSet, obj);
             }
         } else {
-            int retVal = jdbcTemplate.update(originSql, params);
-            if ("java.lang.Integer".equals(methodReturnType) || "int".equals(methodReturnType)) {
-                return retVal;
-            } else if ("java.lang.Boolean".equals(methodReturnType)) {
-                return retVal > 0;
+            // 判断是否是insert 语句
+            ReturnGeneratedKey returnGeneratedKeyAnnotation = method.getAnnotation(ReturnGeneratedKey.class);
+            if (returnGeneratedKeyAnnotation == null) {
+                int retVal = jdbcTemplate.update(originSql, params);
+                if ("java.lang.Integer".equals(methodReturnType) || "int".equals(methodReturnType)) {
+                    return retVal;
+                } else if ("java.lang.Boolean".equals(methodReturnType)) {
+                    return retVal > 0;
+                }
+            } else {
+                // 判断是否是 insert 语句
+                boolean isInsertSql = originSql.startsWith("insert") || originSql.startsWith("INSERT");
+
+                if (isInsertSql) {
+                    KeyHolder keyHolder = new GeneratedKeyHolder();
+                    PreparedStatementCreator preparedStatementCreator = getPreparedStatementCreator(originSql, params, true);
+                    jdbcTemplate.update(preparedStatementCreator, keyHolder);
+                    return keyHolder.getKey().intValue();
+                }
             }
         }
         return "";
