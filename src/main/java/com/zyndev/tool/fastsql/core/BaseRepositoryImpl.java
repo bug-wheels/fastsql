@@ -23,6 +23,7 @@
 
 package com.zyndev.tool.fastsql.core;
 
+import com.zyndev.tool.fastsql.exception.ReflectException;
 import com.zyndev.tool.fastsql.util.BeanReflectionUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -475,10 +476,13 @@ public class BaseRepositoryImpl implements BaseRepository {
             }
             pageListContent.setContent(list);
             return pageListContent;
+        } catch (IllegalAccessException e) {
+            throw new ReflectException(e.getMessage(), e.getCause());
+        } catch (ClassNotFoundException e) {
+            throw new ReflectException(e.getMessage(), e.getCause());
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ReflectException(e.getMessage(), e.getCause());
         }
-        return null;
     }
 
     /**
@@ -526,7 +530,7 @@ public class BaseRepositoryImpl implements BaseRepository {
             PageListContent<E> pageListContent = new PageListContent<>();
             pageListContent.setPageNum(pageNum);
             pageListContent.setPageSize(pageSize);
-            int pageTotal = this.getJdbcTemplate().queryForObject(sql.replaceAll("(?i)select([\\s\\S]*?)from", "select count(*) from "), propertyValue.toArray(), Integer.class);
+            int pageTotal = this.getJdbcTemplate().queryForObject(sql.replaceAll("(?i)select([\\s\\S]*?)from", "select count(*) from "), args, Integer.class);
             pageListContent.setTotalNum(pageTotal);
 
             if (pageTotal == 0) {
