@@ -40,7 +40,7 @@ public class DataSourceHolder {
 
     private static JdbcTemplate jdbcTemplate;
 
-    public static JdbcTemplate getJdbcTemplate() {
+    public JdbcTemplate getJdbcTemplate() {
         return jdbcTemplate;
     }
 

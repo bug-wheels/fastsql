@@ -29,7 +29,6 @@ import com.zyndev.tool.fastsql.util.StringUtil;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.lang.ref.SoftReference;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,11 +38,11 @@ import java.util.Map;
 
 /**
  * The type Annotation parser.
- *
+ * <p>
  * 注解解析工具
  *
  * @author yunan.zhang zyndev@gmail.com
- * @version 0.0.1
+ * @version 0.0.3
  * @since 2017-12-26 16:59:07
  */
 public class AnnotationParser {

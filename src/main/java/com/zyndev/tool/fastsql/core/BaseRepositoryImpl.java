@@ -457,7 +457,7 @@ public class BaseRepositoryImpl implements BaseRepository {
     }
 
     private JdbcTemplate getJdbcTemplate() {
-        return DataSourceHolder.getJdbcTemplate();
+        return DataSourceHolder.getInstance().getJdbcTemplate();
     }
 
 }

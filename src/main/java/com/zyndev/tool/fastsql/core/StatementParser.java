@@ -111,7 +111,7 @@ class StatementParser {
      */
     static Object invoke(Object proxy, Method method, Object[] args) throws Exception {
 
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSourceHolder.getInstance().getDataSource());
+        JdbcTemplate jdbcTemplate = DataSourceHolder.getInstance().getJdbcTemplate();
 
         boolean logDebug = logger.isDebugEnabled();
 
@@ -119,13 +119,12 @@ class StatementParser {
         Query query = method.getAnnotation(Query.class);
 
         if (null == query || StringUtil.isBlank(query.value())) {
+            logger.error(method.toGenericString() + " 无 query 注解或 SQL 为空");
             throw new IllegalStateException(method.toGenericString() + " 无 query 注解或 SQL 为空");
         }
 
+        String originSql = query.value().trim();
 
-        String originSql = query.value();
-
-        System.out.println("=========================");
         System.out.println("sql:" + query.value());
         Map<String, Object> namedParamMap = new HashMap<>();
         Parameter[] parameters = method.getParameters();
@@ -138,17 +137,13 @@ class StatementParser {
                 namedParamMap.put("?" + (i + 1), args[i]);
             }
         }
-        System.out.println("``````````````````````````````");
 
         if (logDebug) {
             logger.debug("执行 sql: " + originSql);
         }
 
-        /**
-         * 判断 sql 类型
-         * TODO 此处需要修改
-         */
-        boolean isQuery = originSql.startsWith("select") || originSql.startsWith("SELECT");
+        // 判断 sql 类型, 判断是否为 select 开头语句
+        boolean isQuery = originSql.trim().matches("(?i)select([\\s\\S]*?)");
         Object[] params = null;
         // rewrite sql
         if (null != args && args.length > 0) {
@@ -193,6 +188,7 @@ class StatementParser {
          */
         System.out.println(methodReturnType);
         if (isQuery) {
+            // 查询方法
             if ("java.lang.Integer".equals(methodReturnType) || "int".equals(methodReturnType)) {
                 return jdbcTemplate.queryForObject(originSql, params, Integer.class);
             } else if ("java.lang.String".equals(methodReturnType)) {
@@ -221,6 +217,7 @@ class StatementParser {
                 return BeanConvert.convert(rowSet, obj);
             }
         } else {
+            // 非查询方法
             // 判断是否是insert 语句
             ReturnGeneratedKey returnGeneratedKeyAnnotation = method.getAnnotation(ReturnGeneratedKey.class);
             if (returnGeneratedKeyAnnotation == null) {
@@ -232,16 +229,24 @@ class StatementParser {
                 }
             } else {
                 // 判断是否是 insert 语句
-                boolean isInsertSql = originSql.startsWith("insert") || originSql.startsWith("INSERT");
-
+                boolean isInsertSql = originSql.trim().matches("(?i)insert([\\s\\S]*?)");
                 if (isInsertSql) {
                     KeyHolder keyHolder = new GeneratedKeyHolder();
                     PreparedStatementCreator preparedStatementCreator = getPreparedStatementCreator(originSql, params, true);
                     jdbcTemplate.update(preparedStatementCreator, keyHolder);
-                    return keyHolder.getKey().intValue();
+                    if ("java.lang.Integer".equals(methodReturnType) || "int".equals(methodReturnType)) {
+                        return keyHolder.getKey().intValue();
+                    } else if ("java.lang.Long".equals(methodReturnType) || "long".equals(methodReturnType)) {
+                        return keyHolder.getKey().longValue();
+                    }
+                    logger.error(method.toGenericString() + " 返回主键id应该为 int 或者 long 类型 ");
+                    throw new IllegalArgumentException(method.toGenericString() + " 返回主键id应该为 int 或者 long 类型 ");
+                } else {
+                    logger.error(method.toGenericString() + " 非 insert 语句 无法返回 GeneratedKey： sql语句为：" + originSql);
+                    throw new IllegalStateException(method.toGenericString() + " 非 insert 语句 无法返回 GeneratedKey： sql语句为：" + originSql);
                 }
             }
         }
-        return "";
+        return null;
     }
 }
