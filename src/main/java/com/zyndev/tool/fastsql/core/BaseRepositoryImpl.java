@@ -571,6 +571,7 @@ public class BaseRepositoryImpl implements BaseRepository {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     private JdbcTemplate getJdbcTemplate() {
