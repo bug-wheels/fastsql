@@ -63,4 +63,13 @@ public class PageListContent<T> implements Serializable {
         this.content = content;
         return this;
     }
+
+    public int getTotalPages() {
+        return (totalNum + pageSize - 1) / pageSize;
+    }
+
+    public int getOffset() {
+        return (pageNum - 1) * pageSize;
+    }
+
 }

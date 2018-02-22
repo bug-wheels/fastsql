@@ -36,10 +36,19 @@ import java.util.Map;
  * The type Bean reflection util.
  *
  * @author yunan.zhang zyndev@gmail.com
- * @version 1.0
+ * @version 0.0.3
  * @date 2017年12月26日 16点36分
  */
 public class BeanReflectionUtil {
+
+    public static Object getPrivatePropertyValue(Object obj,String propertyName)throws Exception{
+        Class cls=obj.getClass();
+        Field field=cls.getDeclaredField(propertyName);
+        field.setAccessible(true);
+        Object retvalue=field.get(obj);
+        return retvalue;
+    }
+
 
     /**
      * Gets static field value.
