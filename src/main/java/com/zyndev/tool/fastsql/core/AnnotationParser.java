@@ -29,9 +29,12 @@ import com.zyndev.tool.fastsql.util.StringUtil;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.lang.ref.SoftReference;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -45,6 +48,10 @@ import java.util.List;
  */
 public class AnnotationParser {
 
+    private final static Map<String, String> tableNameCache = new HashMap<>(30);
+    private final static Map<String, String> tableAllColumnNameCache = new HashMap<>(30);
+    private final static Map<String, List<DBColumnInfo>> tableAllDBColumnCache = new HashMap<>(30);
+
     /**
      * Gets table name.
      *
@@ -53,12 +60,17 @@ public class AnnotationParser {
      * @return the table name
      */
     public static <E> String getTableName(E entity) {
-        Table table = entity.getClass().getAnnotation(Table.class);
-        if (table != null && StringUtil.isNotBlank(table.name())) {
-            return table.name();
-        } else {
-            return entity.getClass().getSimpleName();
+        String tableName = tableNameCache.get(entity.getClass().getName());
+        if (tableName == null) {
+            Table table = entity.getClass().getAnnotation(Table.class);
+            if (table != null && StringUtil.isNotBlank(table.name())) {
+                tableName = table.name();
+            } else {
+                tableName = entity.getClass().getSimpleName();
+            }
+            tableNameCache.put(entity.getClass().getName(), tableName);
         }
+        return tableName;
     }
 
     /**
@@ -69,24 +81,28 @@ public class AnnotationParser {
      * @return the all db column info
      */
     public static <E> List<DBColumnInfo> getAllDBColumnInfo(E entity) {
-        List<DBColumnInfo> dbColumnInfoList = new ArrayList<>();
-        DBColumnInfo dbColumnInfo = null;
-        Field[] fields = entity.getClass().getDeclaredFields();
-        for (Field field : fields) {
-            Column column = field.getAnnotation(Column.class);
-            if (column != null) {
-                dbColumnInfo = new DBColumnInfo();
-                if (StringUtil.isBlank(column.name())) {
-                    dbColumnInfo.setColumnName(field.getName());
-                } else {
-                    dbColumnInfo.setColumnName(column.name());
+        List<DBColumnInfo> dbColumnInfoList = tableAllDBColumnCache.get(entity.getClass().getName());
+        if (dbColumnInfoList == null) {
+            dbColumnInfoList = new ArrayList<>();
+            DBColumnInfo dbColumnInfo;
+            Field[] fields = entity.getClass().getDeclaredFields();
+            for (Field field : fields) {
+                Column column = field.getAnnotation(Column.class);
+                if (column != null) {
+                    dbColumnInfo = new DBColumnInfo();
+                    if (StringUtil.isBlank(column.name())) {
+                        dbColumnInfo.setColumnName(field.getName());
+                    } else {
+                        dbColumnInfo.setColumnName(column.name());
+                    }
+                    if (null != field.getAnnotation(Id.class)) {
+                        dbColumnInfo.setId(true);
+                    }
+                    dbColumnInfo.setFieldName(field.getName());
+                    dbColumnInfoList.add(dbColumnInfo);
                 }
-                if (null != field.getAnnotation(Id.class)) {
-                    dbColumnInfo.setId(true);
-                }
-                dbColumnInfo.setFieldName(field.getName());
-                dbColumnInfoList.add(dbColumnInfo);
             }
+            tableAllDBColumnCache.put(entity.getClass().getName(), dbColumnInfoList);
         }
         return dbColumnInfoList;
     }
@@ -99,16 +115,23 @@ public class AnnotationParser {
      * @return string
      */
     public static <E> String getTableAllColumn(E entity) {
-        List<DBColumnInfo> dbColumnInfoList = getAllDBColumnInfo(entity);
-        StringBuilder allColumnsInfo = new StringBuilder();
-        int i = 1;
-        for (DBColumnInfo dbColumnInfo : dbColumnInfoList) {
-            allColumnsInfo.append(dbColumnInfo.getColumnName());
-            if (i != dbColumnInfoList.size()) {
-                allColumnsInfo.append(",");
+
+        String allColumn = tableAllColumnNameCache.get(entity.getClass().getName());
+        if (allColumn == null) {
+            List<DBColumnInfo> dbColumnInfoList = getAllDBColumnInfo(entity);
+            StringBuilder allColumnsInfo = new StringBuilder();
+            int i = 1;
+            for (DBColumnInfo dbColumnInfo : dbColumnInfoList) {
+                allColumnsInfo.append(dbColumnInfo.getColumnName());
+                if (i != dbColumnInfoList.size()) {
+                    allColumnsInfo.append(",");
+                }
+                i++;
             }
-            i++;
+            allColumn = allColumnsInfo.toString();
+            tableAllColumnNameCache.put(entity.getClass().getName(), allColumn);
         }
-        return allColumnsInfo.toString();
+        return allColumn;
+
     }
 }
