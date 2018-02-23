@@ -34,12 +34,10 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * 这里应该有描述
  *
- * @author 张瑀楠 wb.yunan.zhang@renren-inc.com
+ * @author 张瑀楠 zyndev@gmail.com
  * @version 1.0
  * @date 2018/1/2 14:23
- * TODO:
  */
 public class SqlTest {
 
