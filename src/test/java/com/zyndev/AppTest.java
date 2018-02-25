@@ -35,6 +35,7 @@ public class AppTest {
 
         user.setId(3);
         System.out.println(userRepository.saveUser(3, user));
+        System.out.println(userRepository.saveUser(user));
         // userRepository.queryUserByName("");
     }
 }

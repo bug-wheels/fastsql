@@ -23,11 +23,12 @@
 
 package com.zyndev.tool.fastsql.core;
 
+import com.zyndev.tool.fastsql.exception.ReflectException;
 import com.zyndev.tool.fastsql.util.BeanReflectionUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
-import javax.sql.DataSource;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,7 +59,7 @@ public class BaseRepositoryImpl implements BaseRepository {
             List<DBColumnInfo> dbColumnInfoList = AnnotationParser.getAllDBColumnInfo(entity);
 
             for (DBColumnInfo dbColumnInfo : dbColumnInfoList) {
-                if (dbColumnInfo.isId() || !dbColumnInfo.isInsertable()) {
+                if (dbColumnInfo.isId() || !dbColumnInfo.isInsertAble()) {
                     continue;
                 }
                 // 不为null
@@ -70,7 +71,7 @@ public class BaseRepositoryImpl implements BaseRepository {
                 }
             }
             String sql = "insert into " + tableName + "(" + property.toString().substring(1) + ") values(" + value.toString().substring(1) + ")";
-            return this.jdbcTemplate.update(sql, propertyValue.toArray());
+            return this.getJdbcTemplate().update(sql, propertyValue.toArray());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -147,7 +148,7 @@ public class BaseRepositoryImpl implements BaseRepository {
 
             String sql = "update " + tableName + " set " + property.toString().substring(1) + " where " + where.toString().substring(5);
             propertyValue.addAll(wherePropertyValue);
-            return this.jdbcTemplate.update(sql, propertyValue.toArray());
+            return this.getJdbcTemplate().update(sql, propertyValue.toArray());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -173,8 +174,8 @@ public class BaseRepositoryImpl implements BaseRepository {
                     Object o = BeanReflectionUtil.getFieldValue(entity, dbColumnInfo.getFieldName());
                     if (null != o) {
                         whereValue.add(o);
-                        where.append(" and `").append(dbColumnInfo.getColumnName()).append("` = ? ");
                     }
+                    where.append(" and `").append(dbColumnInfo.getColumnName()).append("` = ? ");
                 }
             }
 
@@ -182,7 +183,7 @@ public class BaseRepositoryImpl implements BaseRepository {
                 throw new IllegalStateException("delete " + tableName + " id 无对应值，不能删除");
             }
             String sql = "delete from  " + tableName + " where " + where.toString();
-            return this.jdbcTemplate.update(sql, whereValue);
+            return this.getJdbcTemplate().update(sql, whereValue);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -236,8 +237,9 @@ public class BaseRepositoryImpl implements BaseRepository {
             } else {
                 sql = "select " + columns + "  from  " + tableName + " where " + where.toString();
             }
+            //// log.info("getObjectById: "+sql);
 
-            SqlRowSet resultSet = this.jdbcTemplate.queryForRowSet(sql, whereValue);
+            SqlRowSet resultSet = this.getJdbcTemplate().queryForRowSet(sql, whereValue);
             Field[] fields = entity.getClass().getDeclaredFields();
             Map<String, String> map = new HashMap<>();
             if (columns != null) {
@@ -311,7 +313,7 @@ public class BaseRepositoryImpl implements BaseRepository {
                 sql = "select " + AnnotationParser.getTableAllColumn(entity) + "  from  " + tableName;
             }
 
-            SqlRowSet resultSet = this.jdbcTemplate.queryForRowSet(sql, propertyValue.toArray());
+            SqlRowSet resultSet = this.getJdbcTemplate().queryForRowSet(sql, propertyValue.toArray());
 
             Map<String, String> map = new HashMap<String, String>();
             for (DBColumnInfo dbColumnInfo : dbColumnInfos) {
@@ -360,15 +362,15 @@ public class BaseRepositoryImpl implements BaseRepository {
     public <E> List<E> getEntityList(String sql, Object[] args, E entity) {
         List<E> list = new ArrayList<>();
         try {
-            SqlRowSet result  =  this.jdbcTemplate.queryForRowSet(sql, args);
-            Map<String,String> map = new HashMap<>();
+            SqlRowSet result = this.getJdbcTemplate().queryForRowSet(sql, args);
+            Map<String, String> map = new HashMap<>();
             //obj 获得字段
             Field[] fields = BeanReflectionUtil.getBeanDeclaredFields(entity.getClass().getName());
-            while(result.next()){
+            while (result.next()) {
                 @SuppressWarnings("unchecked")
                 E temp = (E) BeanReflectionUtil.newInstance(entity.getClass().getName());
-                for(Field field : fields){
-                    if(map.get(field.getName())!=null){
+                for (Field field : fields) {
+                    if (map.get(field.getName()) != null) {
                         field.setAccessible(true);
                         field.set(temp, result.getObject(field.getName()));
                     }
@@ -392,7 +394,12 @@ public class BaseRepositoryImpl implements BaseRepository {
      */
     @Override
     public <E> PageListContent<E> getEntityPageList(E entity, int pageNum, int pageSize) {
-        return null;
+        return getEntityPageList(entity, pageNum, pageSize, null, null);
+    }
+
+    @Override
+    public <E> PageListContent<E> getEntityPageList(E entity, int pageNum, int pageSize, String orderBy) {
+        return getEntityPageList(entity, pageNum, pageSize, null, null);
     }
 
     /**
@@ -405,8 +412,77 @@ public class BaseRepositoryImpl implements BaseRepository {
      * @return the entity page list
      */
     @Override
-    public <E> PageListContent<E> getEntityPageList(E entity, int pageNum, int pageSize, String... columns) {
-        return null;
+    public <E> PageListContent<E> getEntityPageList(E entity, int pageNum, int pageSize, String orderBy, String... columns) {
+        try {
+            Field[] fields = BeanReflectionUtil.getBeanDeclaredFields(entity.getClass().getName());
+            String tableName = AnnotationParser.getTableName(entity);
+            StringBuffer where = new StringBuffer();
+            List<Object> propertyValue = new ArrayList<Object>();
+            List<DBColumnInfo> dbColumnInfoList = AnnotationParser.getAllDBColumnInfo(entity);
+            for (DBColumnInfo vo : dbColumnInfoList) {
+                Object o = BeanReflectionUtil.getPrivatePropertyValue(entity, vo.getColumnName());
+                if (o != null && !o.toString().equals("")) {
+                    where.append(" and ").append(vo.getColumnName()).append(" =?");
+                    propertyValue.add(o);
+                }
+            }
+            String sql;
+            SqlRowSet result = null;
+            //带条件的查询
+            if (propertyValue.size() > 0) {
+                sql = "select " + AnnotationParser.getTableAllColumn(entity) + "  from  " + tableName + " where " + where.toString().substring(4);
+            } else {
+                sql = "select " + AnnotationParser.getTableAllColumn(entity) + "   from  " + tableName;
+            }
+
+            PageListContent<E> pageListContent = new PageListContent<>();
+
+            pageListContent.setPageNum(pageNum);
+            pageListContent.setPageSize(pageSize);
+
+            int pageTotal = this.getJdbcTemplate().queryForObject(sql.replaceAll("(?i)select([\\s\\S]*?)from", "select count(*) from "), propertyValue.toArray(), Integer.class);
+            pageListContent.setTotalNum(pageTotal);
+
+            if (pageTotal == 0) {
+                pageListContent.setContent(new ArrayList<E>(0));
+                return pageListContent;
+            }
+
+            sql = sql + " limit " + pageListContent.getOffset() + "," + pageListContent.getPageSize();
+
+            if (propertyValue.size() > 0) {
+                result = this.getJdbcTemplate().queryForRowSet(sql, propertyValue.toArray());
+            } else {
+                result = this.getJdbcTemplate().queryForRowSet(sql);
+            }
+
+            Map<String, String> map = new HashMap<String, String>();
+
+            for (DBColumnInfo vo : dbColumnInfoList) {
+                map.put(vo.getColumnName(), vo.getColumnName());
+            }
+
+            List<E> list = new ArrayList<>();
+
+            while (result.next()) {
+                E temp = (E) BeanReflectionUtil.newInstance(entity.getClass().getName());
+                for (Field field : fields) {
+                    if (map.get(field.getName()) != null) {
+                        field.setAccessible(true);
+                        field.set(temp, result.getObject(field.getName()));
+                    }
+                }
+                list.add(temp);
+            }
+            pageListContent.setContent(list);
+            return pageListContent;
+        } catch (IllegalAccessException e) {
+            throw new ReflectException(e.getMessage(), e.getCause());
+        } catch (ClassNotFoundException e) {
+            throw new ReflectException(e.getMessage(), e.getCause());
+        } catch (Exception e) {
+            throw new ReflectException(e.getMessage(), e.getCause());
+        }
     }
 
     /**
@@ -416,12 +492,11 @@ public class BaseRepositoryImpl implements BaseRepository {
      * @param entity   the entity
      * @param pageNum  the page num
      * @param pageSize the page size
-     * @param columns  the columns
      * @return the entity page list by sql
      */
     @Override
-    public <E> PageListContent<E> getEntityPageListBySql(String sql, E entity, int pageNum, int pageSize, String... columns) {
-        return null;
+    public <E> PageListContent<E> getEntityPageListBySql(String sql, E entity, int pageNum, int pageSize) {
+        return getEntityPageListBySql(sql, null, entity, pageNum, pageSize, null);
     }
 
     /**
@@ -432,12 +507,11 @@ public class BaseRepositoryImpl implements BaseRepository {
      * @param pageNum  the page num
      * @param pageSize the page size
      * @param orderBy  the order by
-     * @param columns  the columns
      * @return the entity page list by sql
      */
     @Override
-    public <E> PageListContent<E> getEntityPageListBySql(String sql, E entity, int pageNum, int pageSize, String orderBy, String... columns) {
-        return null;
+    public <E> PageListContent<E> getEntityPageListBySql(String sql, E entity, int pageNum, int pageSize, String orderBy) {
+        return getEntityPageListBySql(sql, null, entity, pageNum, pageSize, orderBy);
     }
 
     /**
@@ -448,19 +522,60 @@ public class BaseRepositoryImpl implements BaseRepository {
      * @param entity   the entity
      * @param pageNum  the page num
      * @param pageSize the page size
-     * @param columns  the columns
      * @return the entity page list by sql
      */
     @Override
-    public <E> PageListContent<E> getEntityPageListBySql(String sql, Object[] args, E entity, int pageNum, int pageSize, String... columns) {
+    public <E> PageListContent<E> getEntityPageListBySql(String sql, Object[] args, E entity, int pageNum, int pageSize, String orderBy) {
+        try {
+            PageListContent<E> pageListContent = new PageListContent<>();
+            pageListContent.setPageNum(pageNum);
+            pageListContent.setPageSize(pageSize);
+            int pageTotal = this.getJdbcTemplate().queryForObject(sql.replaceAll("(?i)select([\\s\\S]*?)from", "select count(*) from "), args, Integer.class);
+            pageListContent.setTotalNum(pageTotal);
+
+            if (pageTotal == 0) {
+                pageListContent.setContent(new ArrayList<E>(0));
+                return pageListContent;
+            }
+
+            if (StringUtils.isNotBlank(orderBy)) {
+                sql = sql + " order by " + orderBy;
+            }
+
+            sql = sql + " limit " + pageListContent.getOffset() + "," + pageListContent.getPageSize();
+
+            SqlRowSet sqlRowSet = this.getJdbcTemplate().queryForRowSet(sql, args);
+
+            Map<String, String> map = new HashMap<>();
+            List<DBColumnInfo> dbColumnInfoList = AnnotationParser.getAllDBColumnInfo(entity);
+            for (DBColumnInfo vo : dbColumnInfoList) {
+                map.put(vo.getColumnName(), vo.getColumnName());
+            }
+
+            List<E> list = new ArrayList<>();
+            Field[] declaredFields = entity.getClass().getDeclaredFields();
+            while (sqlRowSet.next()) {
+                E temp = (E) BeanReflectionUtil.newInstance(entity.getClass().getName());
+                for (Field field : declaredFields) {
+                    if (map.get(field.getName()) != null) {
+                        if (!field.isAccessible()) {
+                            field.setAccessible(true);
+                        }
+                        field.set(temp, sqlRowSet.getObject(field.getName()));
+                    }
+                }
+                list.add(temp);
+            }
+            pageListContent.setContent(list);
+            return pageListContent;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
-
-    private JdbcTemplate jdbcTemplate;
-
-    public void setJdbcTemplate(DataSource dataSource) {
-        jdbcTemplate = new JdbcTemplate(dataSource);
+    private JdbcTemplate getJdbcTemplate() {
+        return DataSourceHolder.getInstance().getJdbcTemplate();
     }
 
 }

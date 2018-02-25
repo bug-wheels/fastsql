@@ -162,14 +162,26 @@ public interface BaseRepository {
     /**
      * Gets entity page list.
      *
+     * @param <E>     the type parameter
+     * @param entity  the entity
+     * @param pageNum the page num
+     * @param orderBy the order by
+     * @return the entity page list
+     */
+    <E> PageListContent<E> getEntityPageList(E entity, int pageNum, int pageSize, String orderBy);
+
+    /**
+     * Gets entity page list.
+     *
      * @param <E>      the type parameter
      * @param entity   the entity
      * @param pageNum  the page num
      * @param pageSize the page size
+     * @param orderBy  the order by
      * @param columns  the columns
      * @return the entity page list
      */
-    <E> PageListContent<E> getEntityPageList(E entity, int pageNum, int pageSize, String... columns);
+    <E> PageListContent<E> getEntityPageList(E entity, int pageNum, int pageSize, String orderBy, String... columns);
 
     /**
      * Gets entity page list by sql.
@@ -179,10 +191,9 @@ public interface BaseRepository {
      * @param entity   the entity
      * @param pageNum  the page num
      * @param pageSize the page size
-     * @param columns  the columns
      * @return the entity page list by sql
      */
-    <E> PageListContent<E> getEntityPageListBySql(String sql, E entity, int pageNum, int pageSize, String... columns);
+    <E> PageListContent<E> getEntityPageListBySql(String sql, E entity, int pageNum, int pageSize);
 
     /**
      * Gets entity page list by sql.
@@ -193,10 +204,9 @@ public interface BaseRepository {
      * @param pageNum  the page num
      * @param pageSize the page size
      * @param orderBy  the order by
-     * @param columns  the columns
      * @return the entity page list by sql
      */
-    <E> PageListContent<E> getEntityPageListBySql(String sql, E entity, int pageNum, int pageSize, String orderBy, String... columns);
+    <E> PageListContent<E> getEntityPageListBySql(String sql, E entity, int pageNum, int pageSize, String orderBy);
 
     /**
      * Gets entity page list by sql.
@@ -207,8 +217,8 @@ public interface BaseRepository {
      * @param entity   the entity
      * @param pageNum  the page num
      * @param pageSize the page size
-     * @param columns  the columns
+     * @param orderBy  the order by
      * @return the entity page list by sql
      */
-    <E> PageListContent<E> getEntityPageListBySql(String sql, Object[] args, E entity, int pageNum, int pageSize, String... columns);
+    <E> PageListContent<E> getEntityPageListBySql(String sql, Object[] args, E entity, int pageNum, int pageSize, String orderBy);
 }
