@@ -23,7 +23,6 @@
 
 package com.zyndev.tool.fastsql.core;
 
-import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import com.zyndev.tool.fastsql.annotation.Param;
 import com.zyndev.tool.fastsql.annotation.Query;
 import com.zyndev.tool.fastsql.annotation.ReturnGeneratedKey;
@@ -111,7 +110,7 @@ class StatementParser {
      */
     static Object invoke(Object proxy, Method method, Object[] args) throws Exception {
 
-        JdbcTemplate jdbcTemplate = DataSourceHolder.getInstance().getJdbcTemplate();
+        JdbcTemplate jdbcTemplate = JdbcTemplateHolder.getInstance().getJdbcTemplate();
 
         boolean logDebug = logger.isDebugEnabled();
 

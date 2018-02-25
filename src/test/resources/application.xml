@@ -26,7 +26,7 @@
     </bean>
 
 
-    <bean id="myBeanFactoryPostProcessor" class="com.zyndev.tool.fastsql.core.FastSqlProcessor">
+    <bean id="myBeanFactoryPostProcessor" class="com.zyndev.tool.fastsql.core.FastSqlConfig">
         <property name="basePackage" value="com.zyndev.tool"/>
         <property name="dataSource" ref="dataSource"/>
     </bean>

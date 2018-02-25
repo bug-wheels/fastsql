@@ -23,46 +23,39 @@
 
 package com.zyndev.tool.fastsql.core;
 
-import com.zyndev.tool.fastsql.util.ClassScanner;
-import com.zyndev.tool.fastsql.util.StringUtil;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.stereotype.Repository;
-
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.util.Set;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * 继承 BeanFactoryPostProcessor
- * 扫描可以执行的 Repository 接口 并生成代理添加到 beanFactory 中
+ * 保存一下 dataSource
  *
  * @author 张瑀楠 zyndev@gmail.com
  * @version 0.0.1
- * @since 2017 /12/22 下午10:14
+ * @since 2017 /12/23 下午1:13
  */
-public class FastSqlProcessor {
+public class JdbcTemplateHolder {
 
-    private final Log logger = LogFactory.getLog(FastSqlProcessor.class);
+    private static JdbcTemplateHolder instance = new JdbcTemplateHolder();
 
-    /**
-     * 默认扫描包
-     */
-    private String basePackage = "com";
+    private static JdbcTemplate jdbcTemplate;
 
-    private DataSource dataSource;
-
-    /**
-     * Sets data source.
-     *
-     * @param dataSource the data source
-     */
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
-        DataSourceHolder.getInstance().setDataSource(dataSource);
+    public JdbcTemplate getJdbcTemplate() {
+        return jdbcTemplate;
     }
+
+    private JdbcTemplateHolder() {
+    }
+
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
+    public static JdbcTemplateHolder getInstance() {
+        return instance;
+    }
+
+    public static void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+        JdbcTemplateHolder.jdbcTemplate = jdbcTemplate;
+    }
+
 }
