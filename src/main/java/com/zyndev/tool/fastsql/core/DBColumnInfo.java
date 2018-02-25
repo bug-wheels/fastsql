@@ -25,7 +25,6 @@ package com.zyndev.tool.fastsql.core;
 
 import lombok.Data;
 
-import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 
 /**
@@ -44,7 +43,9 @@ class DBColumnInfo {
      */
     private GenerationType strategy = GenerationType.AUTO;
 
-
+    /**
+     * The name of field
+     */
     private String fieldName;
 
     /**
