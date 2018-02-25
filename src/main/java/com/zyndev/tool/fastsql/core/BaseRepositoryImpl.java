@@ -59,7 +59,7 @@ public class BaseRepositoryImpl implements BaseRepository {
             List<DBColumnInfo> dbColumnInfoList = AnnotationParser.getAllDBColumnInfo(entity);
 
             for (DBColumnInfo dbColumnInfo : dbColumnInfoList) {
-                if (dbColumnInfo.isId() || !dbColumnInfo.isInsertAble()) {
+                if (dbColumnInfo.isId() || !dbColumnInfo.isInsertable()) {
                     continue;
                 }
                 // 不为null
