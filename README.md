@@ -1,4 +1,3 @@
-# zyntool
 ```
                                                                      
    ad88                                                          88  
@@ -183,6 +182,7 @@ public User getUserById(@Param("id") Integer id);
 |:---|:---|
 |`@Query`|标识查询语句|
 |`@Param`|标识命名参数|
+|`@ReturnGeneratedKey`|返回自增主键id|
 
 
 # 运行环境要求

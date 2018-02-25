@@ -3,11 +3,7 @@ package com.zyndev.tool.fastsql;
 import javax.persistence.*;
 
 /**
- * desc :
- * author: 张瑀楠
- * email : zyndev@gmail.com
- * date  : 2017/11/30 下午11:21
- * todo  :
+ * @author 张瑀楠 zyndev@gmail.com
  */
 @Entity
 @Table(name = "tb_student")

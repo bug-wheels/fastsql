@@ -45,58 +45,16 @@ import java.util.Set;
  * @version 0.0.1
  * @since 2017 /12/22 下午10:14
  */
-public class FastSqlProcessor implements BeanFactoryPostProcessor {
+public class FastSqlProcessor {
 
     private final Log logger = LogFactory.getLog(FastSqlProcessor.class);
 
     /**
      * 默认扫描包
      */
-    private String basePackage = "com.zyndev";
+    private String basePackage = "com";
 
     private DataSource dataSource;
-
-    @Override
-    public final void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory)
-            throws BeansException {
-        try {
-            logger.info("start FastSQLProcessor processor");
-            doPostProcessBeanFactory(beanFactory);
-            logger.info("end FastSQLProcessor processor");
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * 处理逻辑，默认扫描 com.zyndev 包下的 Repository 接口，并生成代理加入到
-     *
-     * @param beanFactory beanFactory
-     * @throws IOException io
-     * @throws ClassNotFoundException not found
-     */
-    private void doPostProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws IOException, ClassNotFoundException {
-        ClassScanner classScanner = new ClassScanner();
-        logger.info("------------ scan package :" + basePackage);
-        Set<Class<?>> classSet = classScanner.getPackageAllClasses(basePackage, true);
-        DefaultListableBeanFactory factory = (DefaultListableBeanFactory) beanFactory;
-        for (Class clazz : classSet) {
-            if (clazz.getAnnotation(Repository.class) != null) {
-                logger.info(" add bean [" + clazz.getName() + "] to spring beanFactory");
-                factory.registerSingleton(StringUtil.firstCharToLowerCase(clazz.getSimpleName()), FacadeProxy.newMapperProxy(clazz));
-            }
-        }
-        DataSourceHolder.getInstance().setDataSource(dataSource);
-    }
-
-    /**
-     * Sets base package.
-     *
-     * @param basePackage the base package
-     */
-    public void setBasePackage(String basePackage) {
-        this.basePackage = basePackage;
-    }
 
     /**
      * Sets data source.
@@ -105,5 +63,6 @@ public class FastSqlProcessor implements BeanFactoryPostProcessor {
      */
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
+        DataSourceHolder.getInstance().setDataSource(dataSource);
     }
 }
