@@ -27,6 +27,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+
 /**
  * 继承 BeanFactoryPostProcessor
  * 扫描可以执行的 Repository 接口 并生成代理添加到 beanFactory 中
@@ -54,7 +55,12 @@ public class FastSqlConfig {
         this.basePackage = basePackage;
     }
 
-    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public JdbcTemplate getJdbcTemplate() {
+        return JdbcTemplateHolder.getInstance().getJdbcTemplate();
     }
+
+    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+        JdbcTemplateHolder.setJdbcTemplate(jdbcTemplate);
+    }
+
 }
