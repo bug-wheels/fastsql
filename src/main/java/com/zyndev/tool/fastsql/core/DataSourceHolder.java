@@ -38,7 +38,7 @@ public class DataSourceHolder {
 
     private static DataSourceHolder instance = new DataSourceHolder();
 
-    private static JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
     public JdbcTemplate getJdbcTemplate() {
         return jdbcTemplate;
@@ -64,6 +64,9 @@ public class DataSourceHolder {
      * @return the data source
      */
     public DataSource getDataSource() {
+        if (dataSource == null) {
+            return jdbcTemplate.getDataSource();
+        }
         return dataSource;
     }
 
@@ -75,5 +78,9 @@ public class DataSourceHolder {
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
         jdbcTemplate = new JdbcTemplate(dataSource);
+    }
+
+    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 }

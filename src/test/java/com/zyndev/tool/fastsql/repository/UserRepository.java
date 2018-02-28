@@ -3,18 +3,22 @@ package com.zyndev.tool.fastsql.repository;
 import com.zyndev.tool.fastsql.annotation.Param;
 import com.zyndev.tool.fastsql.annotation.Query;
 import com.zyndev.tool.fastsql.annotation.ReturnGeneratedKey;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 这里应该有描述
  *
  * @version 1.0
  * @author 张瑀楠 zyndev@gmail.com
- * @date 2017 /12/22 18:13
  */
+@NamedQueries({
+        @NamedQuery(name = "findAll", query = "select o from User o")
+})
 @Repository
 public interface UserRepository {
 

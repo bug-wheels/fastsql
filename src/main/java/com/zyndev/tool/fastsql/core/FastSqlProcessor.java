@@ -31,6 +31,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -64,5 +65,13 @@ public class FastSqlProcessor {
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
         DataSourceHolder.getInstance().setDataSource(dataSource);
+    }
+
+    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+        DataSourceHolder.getInstance().setJdbcTemplate(jdbcTemplate);
+    }
+
+    public void setBasePackage(String basePackage) {
+        this.basePackage = basePackage;
     }
 }
