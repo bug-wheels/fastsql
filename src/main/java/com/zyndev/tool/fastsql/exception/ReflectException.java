@@ -1,7 +1,7 @@
 package com.zyndev.tool.fastsql.exception;
 
 /**
- * 这里应该有描述
+ * 反射异常
  *
  * @author 张瑀楠 zyndev@gmail.com
  * @version 1.0
