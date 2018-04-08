@@ -49,7 +49,7 @@ public class SqlTest2 {
                 " @if(:customId != null){ and custom_id = :customId  } ";
 
 
-        List<String> results = StringUtil.matches(executeSql, "@([\\s\\S]*?)}");
+        List<String> results = StringUtil.matches(executeSql, "@if([\\s\\S]*?)}");
         JexlEngine jexl = new JexlBuilder().create();
         JexlContext jc = new MapContext();
         jc.set("_carBrand", "a");
@@ -59,6 +59,7 @@ public class SqlTest2 {
         jc.set("_customName", "a");
         jc.set("_customId", null);
         for (String e: results) {
+            System.out.println(e);
             List<String> abc = StringUtil.matches(e, "\\(([\\s\\S]*?)\\)|\\{([\\s\\S]*?)\\}");
             List<String> abdc = StringUtil.matches(abc.get(0), "\\?\\d+(\\.[A-Za-z]+)?|:[A-Za-z0-9]+(\\.[A-Za-z]+)?");
             String sqlExp = abc.get(0).trim().substring(1, abc.get(0).length() -1 );

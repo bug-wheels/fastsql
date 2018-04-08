@@ -117,7 +117,8 @@ class StatementParser {
 
         String originSql = query.value().trim();
 
-        Map<String, Object> namedParamMap = new HashMap<>();
+        Map<String, Object> namedParamMap = new HashMap<>(args == null ? 0 : args.length * 2);
+
         Parameter[] parameters = method.getParameters();
         if (args != null && args.length > 0) {
             for (int i = 0; i < args.length; ++i) {
@@ -125,16 +126,14 @@ class StatementParser {
                 if (null != param) {
                     namedParamMap.put(param.value(), args[i]);
                 }
-                namedParamMap.put("?" + (i + 1), args[i]);
+                namedParamMap.put(String.valueOf(i + 1), args[i]);
             }
         }
 
         // 语句包含 jexl 表达式，需要处理一下
         if (StatementCache.containJexl(method.getName())) {
-
+            originSql = JexlStatementParser.parseJexl(method.getName(), originSql, namedParamMap);
         }
-
-
 
         if (logDebug) {
             logger.debug("执行 sql: " + originSql);
@@ -161,14 +160,17 @@ class StatementParser {
                             Object param = namedParamMap.get(paramArgs[0].substring(1));
                             params[i] = BeanReflectionUtil.getFieldValue(param, paramArgs[1]);
                         }
-                        continue;
+                    } else {
+                        String paramIndex = results.get(i).substring(1);
+                        originSql = originSql.replaceFirst("\\?" + paramIndex, "?");
+                        params[i] = namedParamMap.get(paramIndex);
                     }
-                    int paramIndex = Integer.parseInt(results.get(i).substring(1));
-                    originSql = originSql.replaceFirst("\\?" + paramIndex, "?");
-                    params[i] = namedParamMap.get(results.get(i));
                 }
             }
         }
+
+        System.out.println("要执行的sql:" + originSql);
+        System.out.println("参数：" + params);
 
         /**
          * 如果返回值是基本类型或者其包装类

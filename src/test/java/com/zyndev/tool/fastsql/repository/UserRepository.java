@@ -3,7 +3,6 @@ package com.zyndev.tool.fastsql.repository;
 import com.zyndev.tool.fastsql.annotation.Param;
 import com.zyndev.tool.fastsql.annotation.Query;
 import com.zyndev.tool.fastsql.annotation.ReturnGeneratedKey;
-import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.NamedQueries;
@@ -28,8 +27,8 @@ public interface UserRepository {
     @Query("delete from tb_user where id = ?1")
     public Boolean deleteById(int id);
 
-    @Query("select count(*) from tb_user where password = ?1 ")
-    public int getCountByPassword(@Param("password") String password);
+    @Query("delete from tb_user where id = ?1")
+    public Integer getCountByPassword(@Param("password") String password);
 
     @Query("select uid from tb_user where password = ?1 ")
     public String getUidByPassword(@Param("password") String password);
@@ -54,7 +53,7 @@ public interface UserRepository {
     @Query("select * " +
             " from tb_user " +
             " where 1=1 " +
-            " #if(?1 != null ) { name like concat('%',?1,'%')} ")
+            " @if(?1 != null ) { and name like concat('%',?1,'%')} ")
     public Map<Integer, User> queryUserByName(String name);
 
 }

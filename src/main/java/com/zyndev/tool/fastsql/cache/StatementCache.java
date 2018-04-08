@@ -16,6 +16,10 @@ public class StatementCache {
      */
     private static Set<String> excludeJexlSet = new HashSet<>(40);
 
+    public static void addToExcludeJexlSet(String methodName) {
+        excludeJexlSet.add(methodName);
+    }
+
     /**
      * Contain jexl boolean.
      *
