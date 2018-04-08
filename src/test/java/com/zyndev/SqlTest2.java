@@ -30,7 +30,6 @@ import org.junit.Test;
 import java.util.List;
 
 /**
- *
  * @author 张瑀楠 zyndev@gmail.com
  * @version 1.0
  * @date 2018/1/2 14:23
@@ -58,11 +57,11 @@ public class SqlTest2 {
         jc.set("_modelCode", "a");
         jc.set("_customName", "a");
         jc.set("_customId", null);
-        for (String e: results) {
+        for (String e : results) {
             System.out.println(e);
             List<String> abc = StringUtil.matches(e, "\\(([\\s\\S]*?)\\)|\\{([\\s\\S]*?)\\}");
             List<String> abdc = StringUtil.matches(abc.get(0), "\\?\\d+(\\.[A-Za-z]+)?|:[A-Za-z0-9]+(\\.[A-Za-z]+)?");
-            String sqlExp = abc.get(0).trim().substring(1, abc.get(0).length() -1 );
+            String sqlExp = abc.get(0).trim().substring(1, abc.get(0).length() - 1);
             for (String a : abdc) {
                 String newSQLExp = "_" + a.substring(1);
                 sqlExp = sqlExp.replace(a, newSQLExp);
@@ -70,7 +69,7 @@ public class SqlTest2 {
             JexlExpression expression = jexl.createExpression(sqlExp);
             Boolean o = (Boolean) expression.evaluate(jc);
             if (o) {
-                executeSql = executeSql.replace(e, abc.get(1).trim().substring(1, abc.get(1).length() -1 ));
+                executeSql = executeSql.replace(e, abc.get(1).trim().substring(1, abc.get(1).length() - 1));
             } else {
                 executeSql = executeSql.replace(e, "");
             }
