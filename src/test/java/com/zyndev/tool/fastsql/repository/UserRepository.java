@@ -5,16 +5,19 @@ import com.zyndev.tool.fastsql.annotation.Query;
 import com.zyndev.tool.fastsql.annotation.ReturnGeneratedKey;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 这里应该有描述
  *
  * @version 1.0
  * @author 张瑀楠 zyndev@gmail.com
- * @date 2017 /12/22 18:13
  */
+@NamedQueries({
+        @NamedQuery(name = "findAll", query = "select o from User o")
+})
 @Repository
 public interface UserRepository {
 
@@ -24,8 +27,8 @@ public interface UserRepository {
     @Query("delete from tb_user where id = ?1")
     public Boolean deleteById(int id);
 
-    @Query("select count(*) from tb_user where password = ?1 ")
-    public int getCountByPassword(@Param("password") String password);
+    @Query("delete from tb_user where id = ?1")
+    public Integer getCountByPassword(@Param("password") String password);
 
     @Query("select uid from tb_user where password = ?1 ")
     public String getUidByPassword(@Param("password") String password);
@@ -50,7 +53,7 @@ public interface UserRepository {
     @Query("select * " +
             " from tb_user " +
             " where 1=1 " +
-            " #if(?1 != null ) { name like concat('%',?1,'%')} ")
+            " @if(?1 != null ) { and name like concat('%',?1,'%')} ")
     public Map<Integer, User> queryUserByName(String name);
 
 }

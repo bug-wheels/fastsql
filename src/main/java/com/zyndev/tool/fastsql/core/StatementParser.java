@@ -26,6 +26,7 @@ package com.zyndev.tool.fastsql.core;
 import com.zyndev.tool.fastsql.annotation.Param;
 import com.zyndev.tool.fastsql.annotation.Query;
 import com.zyndev.tool.fastsql.annotation.ReturnGeneratedKey;
+import com.zyndev.tool.fastsql.cache.StatementCache;
 import com.zyndev.tool.fastsql.convert.BeanConvert;
 import com.zyndev.tool.fastsql.convert.ListConvert;
 import com.zyndev.tool.fastsql.convert.SetConvert;
@@ -37,15 +38,12 @@ import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
@@ -54,43 +52,38 @@ import java.util.Map;
 /**
  * sql 语句解析
  * <p>
- * 暂时只能处理 select count(*) from tb_user 类似语句
  *
  * @author 张瑀楠 zyndev@gmail.com
  * @version 0.0.1
- * @since 2017 /12/23 下午12:11
+ * @since 0.0.1
  */
 class StatementParser {
 
     private final static Log logger = LogFactory.getLog(StatementParser.class);
 
     private static PreparedStatementCreator getPreparedStatementCreator(final String sql, final Object[] args, final boolean returnKeys) {
-        PreparedStatementCreator creator = new PreparedStatementCreator() {
+        PreparedStatementCreator creator = con -> {
+            PreparedStatement ps = con.prepareStatement(sql);
+            if (returnKeys) {
+                ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            } else {
+                ps = con.prepareStatement(sql);
+            }
 
-            @Override
-            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                PreparedStatement ps = con.prepareStatement(sql);
-                if (returnKeys) {
-                    ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                } else {
-                    ps = con.prepareStatement(sql);
-                }
-
-                if (args != null) {
-                    for (int i = 0; i < args.length; i++) {
-                        Object arg = args[i];
-                        if (arg instanceof SqlParameterValue) {
-                            SqlParameterValue paramValue = (SqlParameterValue) arg;
-                            StatementCreatorUtils.setParameterValue(ps, i + 1, paramValue,
-                                    paramValue.getValue());
-                        } else {
-                            StatementCreatorUtils.setParameterValue(ps, i + 1,
-                                    SqlTypeValue.TYPE_UNKNOWN, arg);
-                        }
+            if (args != null) {
+                for (int i = 0; i < args.length; i++) {
+                    Object arg = args[i];
+                    if (arg instanceof SqlParameterValue) {
+                        SqlParameterValue paramValue = (SqlParameterValue) arg;
+                        StatementCreatorUtils.setParameterValue(ps, i + 1, paramValue,
+                                paramValue.getValue());
+                    } else {
+                        StatementCreatorUtils.setParameterValue(ps, i + 1,
+                                SqlTypeValue.TYPE_UNKNOWN, arg);
                     }
                 }
-                return ps;
             }
+            return ps;
         };
         return creator;
     }
@@ -124,8 +117,8 @@ class StatementParser {
 
         String originSql = query.value().trim();
 
-        System.out.println("sql:" + query.value());
-        Map<String, Object> namedParamMap = new HashMap<>();
+        Map<String, Object> namedParamMap = new HashMap<>(args == null ? 0 : args.length * 2);
+
         Parameter[] parameters = method.getParameters();
         if (args != null && args.length > 0) {
             for (int i = 0; i < args.length; ++i) {
@@ -133,8 +126,13 @@ class StatementParser {
                 if (null != param) {
                     namedParamMap.put(param.value(), args[i]);
                 }
-                namedParamMap.put("?" + (i + 1), args[i]);
+                namedParamMap.put(String.valueOf(i + 1), args[i]);
             }
+        }
+
+        // 语句包含 jexl 表达式，需要处理一下
+        if (StatementCache.containJexl(method.getName())) {
+            originSql = JexlStatementParser.parseJexl(method.getName(), originSql, namedParamMap);
         }
 
         if (logDebug) {
@@ -162,25 +160,17 @@ class StatementParser {
                             Object param = namedParamMap.get(paramArgs[0].substring(1));
                             params[i] = BeanReflectionUtil.getFieldValue(param, paramArgs[1]);
                         }
-                        continue;
+                    } else {
+                        String paramIndex = results.get(i).substring(1);
+                        originSql = originSql.replaceFirst("\\?" + paramIndex, "?");
+                        params[i] = namedParamMap.get(paramIndex);
                     }
-                    int paramIndex = Integer.parseInt(results.get(i).substring(1));
-                    originSql = originSql.replaceFirst("\\?" + paramIndex, "?");
-                    params[i] = namedParamMap.get(results.get(i));
                 }
             }
         }
 
-
-        System.out.println("execute sql:" + originSql);
-        System.out.print("params : ");
-        if (null != params) {
-            for (Object o : params) {
-                System.out.print(o + ",\t");
-            }
-        }
-        System.out.println("\n");
-
+        System.out.println("要执行的sql:" + originSql);
+        System.out.println("参数：" + params);
 
         /**
          * 如果返回值是基本类型或者其包装类
@@ -209,7 +199,7 @@ class StatementParser {
                 }
                 return SetConvert.convert(rowSet, obj);
             } else if ("java.util.Map".equals(methodReturnType)) {
-                throw new NotImplementedException();
+                return null;
             } else {
                 SqlRowSet rowSet = jdbcTemplate.queryForRowSet(originSql, params);
                 Object obj = BeanReflectionUtil.newInstance(methodReturnType);

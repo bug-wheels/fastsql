@@ -27,8 +27,7 @@ public class FastSqlRepositoryRegistrar implements ImportBeanDefinitionRegistrar
 
     @Override
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry beanDefinitionRegistry) {
-        System.out.println("FastSqlRepositoryRegistrar registerBeanDefinitions ");
-        String basePackage = "com.sparrow";
+        String basePackage = "com.zyndev";
         ClassScanner classScanner = new ClassScanner();
         Set<Class<?>> classSet = null;
         try {
