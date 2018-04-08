@@ -27,7 +27,6 @@ public class FastSqlRepositoryRegistrar implements ImportBeanDefinitionRegistrar
 
     @Override
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry beanDefinitionRegistry) {
-        System.out.println("FastSqlRepositoryRegistrar registerBeanDefinitions ");
         String basePackage = "com.zyndev";
         ClassScanner classScanner = new ClassScanner();
         Set<Class<?>> classSet = null;
@@ -46,6 +45,5 @@ public class FastSqlRepositoryRegistrar implements ImportBeanDefinitionRegistrar
     @Override
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
         this.beanFactory = (ConfigurableListableBeanFactory) beanFactory;
-        System.out.println("beanFactory 创建成功");
     }
 }
