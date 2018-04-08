@@ -26,6 +26,7 @@ package com.zyndev.tool.fastsql.core;
 import com.zyndev.tool.fastsql.annotation.Param;
 import com.zyndev.tool.fastsql.annotation.Query;
 import com.zyndev.tool.fastsql.annotation.ReturnGeneratedKey;
+import com.zyndev.tool.fastsql.cache.StatementCache;
 import com.zyndev.tool.fastsql.convert.BeanConvert;
 import com.zyndev.tool.fastsql.convert.ListConvert;
 import com.zyndev.tool.fastsql.convert.SetConvert;
@@ -127,6 +128,13 @@ class StatementParser {
                 namedParamMap.put("?" + (i + 1), args[i]);
             }
         }
+
+        // 语句包含 jexl 表达式，需要处理一下
+        if (StatementCache.containJexl(method.getName())) {
+
+        }
+
+
 
         if (logDebug) {
             logger.debug("执行 sql: " + originSql);
