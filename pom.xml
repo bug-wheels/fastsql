@@ -3,7 +3,7 @@
 
     <groupId>com.github.zyndev</groupId>
     <artifactId>fastsql</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.4</version>
     <modelVersion>4.0.0</modelVersion>
 
     <packaging>jar</packaging>
@@ -116,11 +116,11 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-jexl3 -->
         <dependency>
-            <groupId>commons-jexl</groupId>
-            <artifactId>commons-jexl</artifactId>
-            <version>1.1</version>
-            <scope>test</scope>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-jexl3</artifactId>
+            <version>3.1</version>
         </dependency>
 
         <dependency>

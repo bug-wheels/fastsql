@@ -292,13 +292,12 @@ public class BaseRepositoryImpl implements BaseRepository {
     public <E> List<E> getEntityList(E entity, String... columns) {
         List<E> result = new ArrayList<>();
         try {
-            Field[] fields = entity.getClass().getDeclaredFields();
             Object tableName = AnnotationParser.getTableName(entity);
             StringBuilder where = new StringBuilder();
             List<Object> propertyValue = new ArrayList<>();
             List<DBColumnInfo> dbColumnInfos = AnnotationParser.getAllDBColumnInfo(entity);
             for (DBColumnInfo dbColumnInfo : dbColumnInfos) {
-                Object o = BeanReflectionUtil.getFieldValue(entity, dbColumnInfo.getColumnName());
+                Object o = BeanReflectionUtil.getFieldValue(entity, dbColumnInfo.getFieldName());
                 if (o != null && !"".equals(o.toString())) {
                     where.append(" and ").append(dbColumnInfo.getColumnName()).append(" =?");
                     propertyValue.add(o);
@@ -317,16 +316,17 @@ public class BaseRepositoryImpl implements BaseRepository {
 
             Map<String, String> map = new HashMap<String, String>();
             for (DBColumnInfo dbColumnInfo : dbColumnInfos) {
-                map.put(dbColumnInfo.getColumnName(), dbColumnInfo.getColumnName());
+                map.put(dbColumnInfo.getFieldName(), dbColumnInfo.getColumnName());
             }
 
             while (resultSet.next()) {
                 @SuppressWarnings("unchecked")
                 E temp = (E) BeanReflectionUtil.newInstance(entity.getClass().getName());
+                Field[] fields = temp.getClass().getDeclaredFields();
                 for (Field field : fields) {
                     if (map.get(field.getName()) != null) {
                         field.setAccessible(true);
-                        field.set(temp, resultSet.getObject(field.getName()));
+                        field.set(temp, resultSet.getObject(map.get(field.getName())));
                     }
                 }
                 result.add(temp);
@@ -575,7 +575,7 @@ public class BaseRepositoryImpl implements BaseRepository {
     }
 
     private JdbcTemplate getJdbcTemplate() {
-        return DataSourceHolder.getInstance().getJdbcTemplate();
+        return JdbcTemplateHolder.getInstance().getJdbcTemplate();
     }
 
 }
