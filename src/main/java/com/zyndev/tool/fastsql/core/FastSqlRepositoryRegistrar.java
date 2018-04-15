@@ -1,5 +1,6 @@
 package com.zyndev.tool.fastsql.core;
 
+import com.zyndev.tool.fastsql.annotation.EnableFastSql;
 import com.zyndev.tool.fastsql.util.ClassScanner;
 import com.zyndev.tool.fastsql.util.StringUtil;
 import org.springframework.beans.BeansException;
@@ -8,10 +9,16 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
+import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -27,11 +34,33 @@ public class FastSqlRepositoryRegistrar implements ImportBeanDefinitionRegistrar
 
     @Override
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry beanDefinitionRegistry) {
-        String basePackage = "com.zyndev";
+        AnnotationAttributes annoAttrs = AnnotationAttributes.fromMap(annotationMetadata.getAnnotationAttributes(EnableFastSql.class.getName()));
+
+        Class<? extends Annotation> annotationClass = annoAttrs.getClass("annotationClass");
+        if (!Annotation.class.equals(annotationClass)) {
+            System.out.println("ddd");
+        }
+
+        List<String> basePackages = new ArrayList<>();
+        for (String pkg : annoAttrs.getStringArray("value")) {
+            if (StringUtils.hasText(pkg)) {
+                basePackages.add(pkg);
+            }
+        }
+        for (String pkg : annoAttrs.getStringArray("basePackages")) {
+            if (StringUtils.hasText(pkg)) {
+                basePackages.add(pkg);
+            }
+        }
+
+        for (Class<?> clazz : annoAttrs.getClassArray("basePackageClasses")) {
+            basePackages.add(ClassUtils.getPackageName(clazz));
+        }
         ClassScanner classScanner = new ClassScanner();
         Set<Class<?>> classSet = null;
+
         try {
-            classSet = classScanner.getPackageAllClasses(basePackage, true);
+            classSet = classScanner.getPackageAllClasses(basePackages.get(0), true);
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }

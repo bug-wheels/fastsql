@@ -1,6 +1,7 @@
 package com.zyndev;
 
 
+import com.zyndev.tool.fastsql.annotation.EnableFastSql;
 import com.zyndev.tool.fastsql.repository.UserRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,6 +15,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"/app*.xml"})
+@EnableFastSql
 public class AppTest {
 
     @Autowired
