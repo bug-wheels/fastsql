@@ -40,20 +40,7 @@ public class FastSqlConfig {
 
     private final Log logger = LogFactory.getLog(FastSqlConfig.class);
 
-    /**
-     * 默认扫描包
-     */
-    private String basePackage = "com";
-
     private JdbcTemplate jdbcTemplate;
-
-    public String getBasePackage() {
-        return basePackage;
-    }
-
-    public void setBasePackage(String basePackage) {
-        this.basePackage = basePackage;
-    }
 
     public JdbcTemplate getJdbcTemplate() {
         return JdbcTemplateHolder.getInstance().getJdbcTemplate();

@@ -96,7 +96,6 @@ public class BaseRepositoryImpl implements BaseRepository {
      * @param columns the columns
      * @return the int
      */
-    @Override
     public int update(Object entity, String... columns) {
         return update(entity, true, columns);
     }
@@ -121,7 +120,6 @@ public class BaseRepositoryImpl implements BaseRepository {
      * @param columns    the columns
      * @return the int
      */
-    @Override
     public int update(Object entity, boolean ignoreNull, String... columns) {
         try {
             String tableName = AnnotationParser.getTableName(entity);
@@ -187,6 +185,31 @@ public class BaseRepositoryImpl implements BaseRepository {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return 0;
+    }
+
+    @Override
+    public <T> int save(T entity, boolean ignoreNull) {
+        return 0;
+    }
+
+    @Override
+    public <T> List<T> saveAll(Iterable<T> entities) {
+        return null;
+    }
+
+    @Override
+    public <T> List<T> saveAll(Iterable<T> entities, boolean ignoreNull) {
+        return null;
+    }
+
+    @Override
+    public <T> List<T> findAll() {
+        return null;
+    }
+
+    @Override
+    public <T> int deleteInBatch(Iterable<T> entities) {
         return 0;
     }
 
