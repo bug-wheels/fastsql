@@ -1,97 +1,62 @@
 package com.zyndev.tool.fastsql.repository;
 
-import java.util.Optional;
+import com.zyndev.tool.fastsql.core.PageListContent;
+
+import java.util.List;
 
 /**
  * @author 张瑀楠 zyndev@gmail.com
  * @version 0.0.5
  */
-public interface CrudRepository<T, ID> {
+public interface CrudRepository {
 
-    /**
-     * Saves a given entity. Use the returned instance for further operations as the save operation might have changed the
-     * entity instance completely.
-     *
-     * @param entity must not be {@literal null}.
-     * @return the saved entity will never be {@literal null}.
-     */
-    <S extends T> S save(S entity);
+    <T> boolean existsById(T entity);
 
-    /**
-     * Saves all given entities.
-     *
-     * @param entities must not be {@literal null}.
-     * @return the saved entities will never be {@literal null}.
-     * @throws IllegalArgumentException in case the given entity is {@literal null}.
-     */
-    <S extends T> Iterable<S> saveAll(Iterable<S> entities);
+    <T> long count(T entity);
 
-    /**
-     * Retrieves an entity by its id.
-     *
-     * @param id must not be {@literal null}.
-     * @return the entity with the given id or {@literal Optional#empty()} if none found
-     * @throws IllegalArgumentException if {@code id} is {@literal null}.
-     */
-    Optional<T> findById(ID id);
+    <T> int save(T entity);
 
-    /**
-     * Returns whether an entity with the given id exists.
-     *
-     * @param id must not be {@literal null}.
-     * @return {@literal true} if an entity with the given id exists, {@literal false} otherwise.
-     * @throws IllegalArgumentException if {@code id} is {@literal null}.
-     */
-    boolean existsById(ID id);
+    <T> int saveAll(Iterable<T> entities);
 
-    /**
-     * Returns all instances of the type.
-     *
-     * @return all entities
-     */
-    Iterable<T> findAll();
+    <T> int save(T entity, boolean ignoreNull);
 
-    /**
-     * Returns all instances of the type with the given IDs.
-     *
-     * @param ids
-     * @return
-     */
-    Iterable<T> findAllById(Iterable<ID> ids);
+    <T> int saveAll(Iterable<T> entities, boolean ignoreNull);
 
-    /**
-     * Returns the number of entities available.
-     *
-     * @return the number of entities
-     */
-    long count();
+    <T> int deleteById(T entity);
 
-    /**
-     * Deletes the entity with the given id.
-     *
-     * @param id must not be {@literal null}.
-     * @throws IllegalArgumentException in case the given {@code id} is {@literal null}
-     */
-    void deleteById(ID id);
+    <T> int delete(T entity);
 
-    /**
-     * Deletes a given entity.
-     *
-     * @param entity
-     * @throws IllegalArgumentException in case the given entity is {@literal null}.
-     */
-    void delete(T entity);
+    <T> int deleteAll(Iterable<T> entities);
 
-    /**
-     * Deletes the given entities.
-     *
-     * @param entities
-     * @throws IllegalArgumentException in case the given {@link Iterable} is {@literal null}.
-     */
-    void deleteAll(Iterable<? extends T> entities);
+    <T> int update(T entity);
 
-    /**
-     * Deletes all entities managed by the repository.
-     */
-    void deleteAll();
+    <T> int update(T entity, boolean ignoreNull);
+
+    <T> int update(Iterable<T> entities);
+
+    <T> int update(Iterable<T> entities, boolean ignoreNull);
+
+    <T> T findById(T entity);
+
+    <T> T findById(T entity, String... columns);
+
+    <T> List<T> getEntityList(T entity);
+
+    <T> List<T> getEntityList(T entity, String... columns);
+
+    <T> List<T> getEntityListBySQL(String sql, T entity);
+
+    <T> List<T> getEntityListBySQL(String sql, Object[] args, T entity);
+
+    <T> PageListContent<T> getEntityPageList(T entity, int pageNum, int pageSize);
+
+    <T> PageListContent<T> getEntityPageList(T entity, int pageNum, int pageSize, String orderBy);
+
+    <T> PageListContent<T> getEntityPageList(T entity, int pageNum, int pageSize, String orderBy, String... columns);
+
+    <T> PageListContent<T> getEntityPageListBySql(String sql, T entity, int pageNum, int pageSize);
+
+    <T> PageListContent<T> getEntityPageListBySql(String sql, T entity, int pageNum, int pageSize, String orderBy);
+
+    <T> PageListContent<T> getEntityPageListBySql(String sql, Object[] args, T entity, int pageNum, int pageSize, String orderBy);
 }
