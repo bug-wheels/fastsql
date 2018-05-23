@@ -103,9 +103,9 @@ class StatementParser {
      */
     static Object invoke(Object proxy, Method method, Object[] args) throws Exception {
 
-        JdbcTemplate jdbcTemplate = JdbcTemplateHolder.getInstance().getJdbcTemplate();
+        System.out.println("fastsql.showSql:" + GlobalConfig.getShowSql());
 
-        boolean logDebug = logger.isDebugEnabled();
+        JdbcTemplate jdbcTemplate = JdbcTemplateHolder.getInstance().getJdbcTemplate();
 
         String methodReturnType = method.getReturnType().getName();
         Query query = method.getAnnotation(Query.class);
@@ -135,9 +135,7 @@ class StatementParser {
             originSql = JexlStatementParser.parseJexl(method.getName(), originSql, namedParamMap);
         }
 
-        if (logDebug) {
-            logger.debug("执行 sql: " + originSql);
-        }
+        logger.debug("执行 sql: " + originSql);
 
         // 判断 sql 类型, 判断是否为 select 开头语句
         boolean isQuery = originSql.trim().matches("(?i)select([\\s\\S]*?)");

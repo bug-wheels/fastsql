@@ -39,7 +39,7 @@ import java.lang.reflect.Proxy;
  */
 public class FacadeProxy implements InvocationHandler {
 
-    private final static Log logger = LogFactory.getLog(FacadeProxy.class);
+    private static final Log logger = LogFactory.getLog(FacadeProxy.class);
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
@@ -53,7 +53,7 @@ public class FacadeProxy implements InvocationHandler {
      * @param mapperInterface the mapper interface
      * @return the t
      */
-    protected static <T> T newMapperProxy(Class<T> mapperInterface) {
+    static <T> T newMapperProxy(Class<T> mapperInterface) {
         logger.info(" 生成代理：" + mapperInterface.getName());
         ClassLoader classLoader = mapperInterface.getClassLoader();
         Class<?>[] interfaces = new Class[]{mapperInterface};

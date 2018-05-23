@@ -6,6 +6,7 @@ import com.zyndev.tool.fastsql.util.StringUtil;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
@@ -31,8 +32,13 @@ public class FastSqlRepositoryRegistrar implements ImportBeanDefinitionRegistrar
 
     private ConfigurableListableBeanFactory beanFactory;
 
+    @Value("${fastsql.showSql}")
+    private boolean showSql;
+
     @Override
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry beanDefinitionRegistry) {
+        GlobalConfig.setShowSql(showSql);
+
         AnnotationAttributes annoAttrs = AnnotationAttributes.fromMap(annotationMetadata.getAnnotationAttributes(EnableFastSql.class.getName()));
 
         Class<? extends Annotation> annotationClass = annoAttrs.getClass("annotationClass");
