@@ -30,6 +30,7 @@ import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -87,20 +88,29 @@ public class AnnotationParser {
             DBColumnInfo dbColumnInfo;
             Field[] fields = entity.getClass().getDeclaredFields();
             for (Field field : fields) {
+
+                int mod = field.getModifiers();
+                if ((mod & Modifier.STATIC) != 0 || (mod & Modifier.FINAL) != 0) {
+                    continue;
+                }
+
                 Column column = field.getAnnotation(Column.class);
+                dbColumnInfo = new DBColumnInfo();
                 if (column != null) {
-                    dbColumnInfo = new DBColumnInfo();
                     if (StringUtil.isBlank(column.name())) {
-                        dbColumnInfo.setColumnName(field.getName());
+                        dbColumnInfo.setColumnName(StringUtil.camelToUnderline(field.getName()));
                     } else {
                         dbColumnInfo.setColumnName(column.name());
                     }
-                    if (null != field.getAnnotation(Id.class)) {
-                        dbColumnInfo.setId(true);
-                    }
-                    dbColumnInfo.setFieldName(field.getName());
-                    dbColumnInfoList.add(dbColumnInfo);
+                } else {
+                    dbColumnInfo.setColumnName(StringUtil.camelToUnderline(field.getName()));
                 }
+                if (null != field.getAnnotation(Id.class)) {
+                    dbColumnInfo.setId(true);
+                }
+                dbColumnInfo.setFieldName(field.getName());
+                dbColumnInfoList.add(dbColumnInfo);
+
             }
             tableAllDBColumnCache.put(entity.getClass().getName(), dbColumnInfoList);
         }

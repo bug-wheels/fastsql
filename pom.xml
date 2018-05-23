@@ -3,7 +3,7 @@
 
     <groupId>com.github.zyndev</groupId>
     <artifactId>fastsql</artifactId>
-    <version>0.0.5</version>
+    <version>0.0.5-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
 
     <packaging>jar</packaging>
@@ -127,13 +127,6 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.5</version>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/redis.clients/jedis -->
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>2.9.0</version>
         </dependency>
 
 

@@ -12,7 +12,6 @@ import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -53,9 +52,6 @@ public class FastSqlRepositoryRegistrar implements ImportBeanDefinitionRegistrar
             }
         }
 
-        for (Class<?> clazz : annoAttrs.getClassArray("basePackageClasses")) {
-            basePackages.add(ClassUtils.getPackageName(clazz));
-        }
         ClassScanner classScanner = new ClassScanner();
         Set<Class<?>> classSet = null;
 
