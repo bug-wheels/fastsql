@@ -59,6 +59,7 @@ public class AnnotationParser {
      * @return the table name
      */
     public static <E> String getTableName(E entity) {
+
         String tableName = tableNameCache.get(entity.getClass().getName());
         if (tableName == null) {
             Table table = entity.getClass().getAnnotation(Table.class);
