@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Import;
 import java.lang.annotation.*;
 
 /**
+ * 启用 FastSQL 注解
+ *
  * @author 张瑀楠 zyndev@gmail.com
  * @version 0.0.1
  */
@@ -16,16 +18,17 @@ import java.lang.annotation.*;
 public @interface EnableFastSql {
 
     /**
-     * Alias for the {@link #basePackages()} attribute. Allows for more concise
-     * annotation declarations e.g.:
-     * {@code @EnableMyBatisMapperScanner("org.my.pkg")} instead of {@code
+     * 指定扫描的包
      *
-     * @EnableMyBatisMapperScanner(basePackages= "org.my.pkg"})}.
+     * annotation declarations e.g.:
+     * {@code @EnableFastSql("com.zyndev.tool")} instead of {@code
+     *
+     * @EnableFastSql(basePackages= "com.zyndev.tool"})}.
      */
     String[] value() default {};
 
     /**
-     * Base packages to scan for MyBatis interfaces. Note that only interfaces
+     * Base packages to scan for FastSQL interfaces. Note that only interfaces
      * with at least one method will be registered; concrete classes will be
      * ignored.
      */
@@ -41,11 +44,4 @@ public @interface EnableFastSql {
      */
     Class<? extends Annotation> annotationClass() default Annotation.class;
 
-    /**
-     * Type-safe alternative to {@link #basePackages()} for specifying the packages
-     * to scan for annotated components. The package of each class specified will be scanned.
-     * <p>Consider creating a special no-op marker class or interface in each package
-     * that serves no purpose other than being referenced by this attribute.
-     */
-    Class<?>[] basePackageClasses() default {};
 }
