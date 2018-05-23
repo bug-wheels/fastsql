@@ -34,7 +34,7 @@ import java.util.List;
 /**
  * The type List convert.
  *
- * 将对应的sqlRowSet 转换为 list
+ * 将对应的 sqlRowSet 转换为 list
  *
  * @author 张瑀楠 zyndev@gmail.com
  * @version 0.0.1

@@ -37,7 +37,6 @@ import java.lang.reflect.Proxy;
  * @version 0.0.1
  * @since  2017 /12/23 上午12:40
  */
-@SuppressWarnings("unchecked")
 public class FacadeProxy implements InvocationHandler {
 
     private final static Log logger = LogFactory.getLog(FacadeProxy.class);
