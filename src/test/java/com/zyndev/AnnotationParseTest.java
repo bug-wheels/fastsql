@@ -12,8 +12,15 @@ public class AnnotationParseTest {
 
     @Test
     public void test() {
-        System.out.println(AnnotationParser.getTableName(new Stall()));
-        System.out.println(AnnotationParser.getTableAllColumn(new Stall()));
+        long start = 0;
+        long end = 0;
+        for(int i=0; i<1100; ++i) {
+            start = System.currentTimeMillis();
+            System.out.println(AnnotationParser.getTableName(new Stall()));
+            System.out.println(AnnotationParser.getTableAllColumn(new Stall()));
+            end = System.currentTimeMillis();
+            System.out.println(i + "次： " + (end - start));
+        }
     }
 
 }

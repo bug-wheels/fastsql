@@ -21,7 +21,7 @@ import java.util.*;
 public class CrudRepositoryImpl implements CrudRepository {
     @Override
     public <T> boolean existsById(T entity) {
-        return findById(entity) != null;
+        return findById(entity, "id") != null;
     }
 
     @Override
@@ -31,7 +31,7 @@ public class CrudRepositoryImpl implements CrudRepository {
 
     @Override
     public <T> int save(T entity) {
-        return 0;
+        return save(entity, true);
     }
 
     @Override
@@ -41,6 +41,34 @@ public class CrudRepositoryImpl implements CrudRepository {
 
     @Override
     public <T> int save(T entity, boolean ignoreNull) {
+        try {
+            String tableName = AnnotationParser.getTableName(entity);
+
+            StringBuilder property = new StringBuilder();
+
+            StringBuilder value = new StringBuilder();
+
+            List<Object> propertyValue = new ArrayList<>();
+
+            List<DBColumnInfo> dbColumnInfoList = AnnotationParser.getAllDBColumnInfo(entity);
+
+            for (DBColumnInfo dbColumnInfo : dbColumnInfoList) {
+                if (dbColumnInfo.isId() || !dbColumnInfo.isInsertable()) {
+                    continue;
+                }
+                // 不为null
+                Object o = BeanReflectionUtil.getFieldValue(entity, dbColumnInfo.getFieldName());
+                if (o != null || ignoreNull) {
+                    property.append(",").append(dbColumnInfo.getColumnName());
+                    value.append(",").append("?");
+                    propertyValue.add(o);
+                }
+            }
+            String sql = "insert into " + tableName + "(" + property.toString().substring(1) + ") values(" + value.toString().substring(1) + ")";
+            return this.getJdbcTemplate().update(sql, propertyValue.toArray());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return 0;
     }
 
@@ -51,26 +79,107 @@ public class CrudRepositoryImpl implements CrudRepository {
 
     @Override
     public <T> int deleteById(T entity) {
+        try {
+            String tableName = AnnotationParser.getTableName(entity);
+            StringBuilder where = new StringBuilder(" 1=1 ");
+            List<Object> whereValue = new ArrayList<>(5);
+            List<DBColumnInfo> dbColumnInfos = AnnotationParser.getAllDBColumnInfo(entity);
+            for (DBColumnInfo dbColumnInfo : dbColumnInfos) {
+                if (dbColumnInfo.isId()) {
+                    Object o = BeanReflectionUtil.getFieldValue(entity, dbColumnInfo.getFieldName());
+                    if (null != o) {
+                        whereValue.add(o);
+                    }
+                    where.append(" and `").append(dbColumnInfo.getColumnName()).append("` = ? ");
+                }
+            }
+
+            if (whereValue.size() == 0) {
+                throw new IllegalStateException("delete " + tableName + " id 无对应值，不能删除");
+            }
+            String sql = "delete from  " + tableName + " where " + where.toString();
+            return this.getJdbcTemplate().update(sql, whereValue);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return 0;
     }
 
     @Override
     public <T> int delete(T entity) {
+        try {
+            String tableName = AnnotationParser.getTableName(entity);
+            StringBuilder where = new StringBuilder(" 1=1 ");
+            List<Object> whereValue = new ArrayList<>(5);
+            List<DBColumnInfo> dbColumnInfos = AnnotationParser.getAllDBColumnInfo(entity);
+            for (DBColumnInfo dbColumnInfo : dbColumnInfos) {
+                Object o = BeanReflectionUtil.getFieldValue(entity, dbColumnInfo.getFieldName());
+                if (null != o) {
+                    whereValue.add(o);
+                }
+                where.append(" and `").append(dbColumnInfo.getColumnName()).append("` = ? ");
+            }
+
+            if (whereValue.size() == 0) {
+                throw new IllegalStateException("delete " + tableName + " id 无对应值，不能删除");
+            }
+            String sql = "delete from  " + tableName + " where " + where.toString();
+            return this.getJdbcTemplate().update(sql, whereValue);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return 0;
     }
 
     @Override
     public <T> int deleteAll(Iterable<T> entities) {
+
         return 0;
     }
 
     @Override
     public <T> int update(T entity) {
-        return 0;
+        return update(entity, true);
     }
 
     @Override
     public <T> int update(T entity, boolean ignoreNull) {
+        try {
+            String tableName = AnnotationParser.getTableName(entity);
+
+            StringBuilder property = new StringBuilder();
+
+            StringBuilder where = new StringBuilder();
+
+            List<Object> propertyValue = new ArrayList<>();
+
+            List<Object> wherePropertyValue = new ArrayList<>();
+
+            List<DBColumnInfo> dbColumnInfos = AnnotationParser.getAllDBColumnInfo(entity);
+
+            for (DBColumnInfo dbColumnInfo : dbColumnInfos) {
+
+                Object o = BeanReflectionUtil.getFieldValue(entity, dbColumnInfo.getFieldName());
+                if (dbColumnInfo.isId()) {
+                    where.append(" and ").append(dbColumnInfo.getColumnName()).append(" = ? ");
+                    wherePropertyValue.add(o);
+                } else if (ignoreNull || o != null) {
+                    property.append(",").append(dbColumnInfo.getColumnName()).append("=?");
+                    propertyValue.add(o);
+                }
+
+            }
+
+            if (wherePropertyValue.isEmpty()) {
+                throw new IllegalArgumentException("更新表 [" + tableName + "] 无法找到id, 请求数据：" + entity);
+            }
+
+            String sql = "update " + tableName + " set " + property.toString().substring(1) + " where " + where.toString().substring(5);
+            propertyValue.addAll(wherePropertyValue);
+            return this.getJdbcTemplate().update(sql, propertyValue.toArray());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return 0;
     }
 
@@ -91,8 +200,6 @@ public class CrudRepositoryImpl implements CrudRepository {
 
     @Override
     public <T> T findById(T entity, String... columns) {
-        T result = null;
-        boolean isExist = false;
         try {
             Object tableName = AnnotationParser.getTableName(entity);
             StringBuilder where = new StringBuilder(20);
@@ -109,9 +216,6 @@ public class CrudRepositoryImpl implements CrudRepository {
                     whereValue.add(o);
                 }
             }
-
-            //noinspection unchecked
-            result = (T) BeanReflectionUtil.newInstance(entity.getClass().getName());
 
             String sql = null;
             if (columns == null || columns.length == 0) {
@@ -141,8 +245,9 @@ public class CrudRepositoryImpl implements CrudRepository {
             for (String str : columns) {
                 columnSet.add(str.trim());
             }
-            while (resultSet.next()) {
-                isExist = true;
+            T result = null;
+            if (resultSet.next()) {
+                result = (T) BeanReflectionUtil.newInstance(entity.getClass().getName());
                 for (Field field : fields) {
                     //表字段存在才有意义
                     if (columnSet.contains(fieldColumnMap.get(field.getName()))) {
@@ -150,20 +255,19 @@ public class CrudRepositoryImpl implements CrudRepository {
                         field.set(result, resultSet.getObject(fieldColumnMap.get(field.getName())));
                     }
                 }
+            } else {
+                return null;
             }
 
             if (resultSet.next()) {
                 throw new IllegalStateException(" 期望得到 0 或 1 个结果，实际得到多个");
             }
 
+            return result;
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e.getMessage(), e);
         }
-        if (isExist) {
-            return result;
-        }
-        return null;
     }
 
     @Override
