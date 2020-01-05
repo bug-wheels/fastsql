@@ -9,8 +9,14 @@ import java.util.Map;
 
 /**
  * The type Jexl statement parser.
+ *
+ * @author yunan.zhang zyndev@gmail.com
+ * @version 0.0.4
  */
-public class JexlStatementParser {
+class JexlStatementParser {
+
+    private JexlStatementParser() {
+    }
 
     /**
      * Parse jexl string.
@@ -20,7 +26,7 @@ public class JexlStatementParser {
      * @param params  the params
      * @return the string
      */
-    public static String parseJexl(String key, String jexlSql, Map<String, Object> params) {
+    static String parseJexl(String key, String jexlSql, Map<String, Object> params) {
         if (!StatementCache.containJexl(key)) {
             return jexlSql;
         }

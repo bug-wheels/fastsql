@@ -41,6 +41,7 @@ public class BeanConvert {
 
     /**
      * Convert t.
+     * 将 SqlRowSet 转换为对应的 Bean
      *
      * @param <T>       the type parameter
      * @param sqlRowSet the sql row set

@@ -27,6 +27,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import javax.sql.DataSource;
+
 
 /**
  * 继承 BeanFactoryPostProcessor
@@ -40,13 +42,18 @@ public class FastSqlConfig {
 
     private final Log logger = LogFactory.getLog(FastSqlConfig.class);
 
-    private JdbcTemplate jdbcTemplate;
+    private DataSource dataSource;
 
     public JdbcTemplate getJdbcTemplate() {
         return JdbcTemplateHolder.getInstance().getJdbcTemplate();
     }
 
-    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+    public synchronized void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    public synchronized void setJdbcTemplate(DataSource dataSource) {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         JdbcTemplateHolder.setJdbcTemplate(jdbcTemplate);
     }
 

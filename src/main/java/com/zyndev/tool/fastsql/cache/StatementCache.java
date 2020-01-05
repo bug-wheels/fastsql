@@ -5,6 +5,10 @@ import java.util.Set;
 
 /**
  * The type Statement cache.
+ * jexl 表达式缓存
+ *
+ * 保证表达式只解析一次
+ *
  *
  * @author yunan.zhang
  * @version 0.0.4

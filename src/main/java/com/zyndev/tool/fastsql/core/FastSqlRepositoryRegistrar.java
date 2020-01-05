@@ -6,13 +6,13 @@ import com.zyndev.tool.fastsql.util.StringUtil;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -32,8 +32,13 @@ public class FastSqlRepositoryRegistrar implements ImportBeanDefinitionRegistrar
 
     private ConfigurableListableBeanFactory beanFactory;
 
+    @Value("${fastsql.showSql}")
+    private boolean showSql;
+
     @Override
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry beanDefinitionRegistry) {
+        GlobalConfig.setShowSql(showSql);
+
         AnnotationAttributes annoAttrs = AnnotationAttributes.fromMap(annotationMetadata.getAnnotationAttributes(EnableFastSql.class.getName()));
 
         Class<? extends Annotation> annotationClass = annoAttrs.getClass("annotationClass");
@@ -53,9 +58,6 @@ public class FastSqlRepositoryRegistrar implements ImportBeanDefinitionRegistrar
             }
         }
 
-        for (Class<?> clazz : annoAttrs.getClassArray("basePackageClasses")) {
-            basePackages.add(ClassUtils.getPackageName(clazz));
-        }
         ClassScanner classScanner = new ClassScanner();
         Set<Class<?>> classSet = null;
 

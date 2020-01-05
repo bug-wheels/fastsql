@@ -34,7 +34,7 @@ import javax.persistence.GenerationType;
  * @version 0.0.1
  */
 @Data
-class DBColumnInfo {
+public class DBColumnInfo {
 
     /**
      * (Optional) The primary key generation strategy

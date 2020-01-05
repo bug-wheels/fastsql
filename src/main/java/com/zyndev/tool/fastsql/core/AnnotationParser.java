@@ -27,9 +27,11 @@ package com.zyndev.tool.fastsql.core;
 import com.zyndev.tool.fastsql.util.StringUtil;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,8 +61,14 @@ public class AnnotationParser {
      * @return the table name
      */
     public static <E> String getTableName(E entity) {
+
         String tableName = tableNameCache.get(entity.getClass().getName());
         if (tableName == null) {
+
+            if (entity.getClass().getAnnotation(Entity.class) == null) {
+                throw new IllegalArgumentException("类 " + entity.getClass().getName() + " 未声明 Entity 注解");
+            }
+
             Table table = entity.getClass().getAnnotation(Table.class);
             if (table != null && StringUtil.isNotBlank(table.name())) {
                 tableName = table.name();
@@ -81,25 +89,40 @@ public class AnnotationParser {
      */
     public static <E> List<DBColumnInfo> getAllDBColumnInfo(E entity) {
         List<DBColumnInfo> dbColumnInfoList = tableAllDBColumnCache.get(entity.getClass().getName());
+
         if (dbColumnInfoList == null) {
+
+            if (entity.getClass().getAnnotation(Entity.class) == null) {
+                throw new IllegalArgumentException("类 " + entity.getClass().getName() + " 未声明 Entity 注解");
+            }
+
             dbColumnInfoList = new ArrayList<>();
             DBColumnInfo dbColumnInfo;
             Field[] fields = entity.getClass().getDeclaredFields();
             for (Field field : fields) {
+
+                int mod = field.getModifiers();
+                if ((mod & Modifier.STATIC) != 0 || (mod & Modifier.FINAL) != 0) {
+                    continue;
+                }
+
                 Column column = field.getAnnotation(Column.class);
+                dbColumnInfo = new DBColumnInfo();
                 if (column != null) {
-                    dbColumnInfo = new DBColumnInfo();
                     if (StringUtil.isBlank(column.name())) {
-                        dbColumnInfo.setColumnName(field.getName());
+                        dbColumnInfo.setColumnName(StringUtil.camelToUnderline(field.getName()));
                     } else {
                         dbColumnInfo.setColumnName(column.name());
                     }
-                    if (null != field.getAnnotation(Id.class)) {
-                        dbColumnInfo.setId(true);
-                    }
-                    dbColumnInfo.setFieldName(field.getName());
-                    dbColumnInfoList.add(dbColumnInfo);
+                } else {
+                    dbColumnInfo.setColumnName(StringUtil.camelToUnderline(field.getName()));
                 }
+                if (null != field.getAnnotation(Id.class)) {
+                    dbColumnInfo.setId(true);
+                }
+                dbColumnInfo.setFieldName(field.getName());
+                dbColumnInfoList.add(dbColumnInfo);
+
             }
             tableAllDBColumnCache.put(entity.getClass().getName(), dbColumnInfoList);
         }
