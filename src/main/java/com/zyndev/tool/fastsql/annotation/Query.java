@@ -33,14 +33,14 @@ import java.lang.annotation.Target;
  *
  * @author 张瑀楠 zyndev@gmail.com
  * @version 0.0.1
- * @since  2017/12/22 17:26
+ * @since 2017/12/22 17:26
  */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Query {
 
-    /**
-     * sql 语句
-     */
-    String value();
+  /**
+   * sql 语句
+   */
+  String value();
 }

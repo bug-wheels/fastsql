@@ -8,7 +8,8 @@ package com.zyndev.tool.fastsql.exception;
  * @date 2018/2/22 17:06
  */
 public class SqlException extends RuntimeException {
-    public SqlException(String message, Throwable cause) {
-        super(message, cause);
-    }
+
+  public SqlException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

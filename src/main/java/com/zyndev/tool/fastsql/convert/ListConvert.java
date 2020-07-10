@@ -25,15 +25,14 @@ package com.zyndev.tool.fastsql.convert;
 
 import com.zyndev.tool.fastsql.util.BeanReflectionUtil;
 import com.zyndev.tool.fastsql.util.StringUtil;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 /**
  * The type List convert.
- *
+ * <p>
  * 将对应的 sqlRowSet 转换为 list
  *
  * @author 张瑀楠 zyndev@gmail.com
@@ -42,33 +41,33 @@ import java.util.List;
  */
 public class ListConvert {
 
-    /**
-     * Convert list.
-     *
-     * @param <T>       the type parameter
-     * @param sqlRowSet the sql row set
-     * @param t         the t
-     * @return the list
-     * @throws Exception the exception
-     */
-    public static <T> List<T> convert(SqlRowSet sqlRowSet, T t) throws Exception {
-        List<T> result = new ArrayList<>(20);
-        String[] columnNames = sqlRowSet.getMetaData().getColumnNames();
-        Class clazz = t.getClass();
-        while (sqlRowSet.next()) {
-            T bean = (T) BeanReflectionUtil.newInstance(clazz);
-            for (String columnName : columnNames) {
-                Field field = clazz.getDeclaredField(StringUtil.convertColumnNameToUpperCamelCase(columnName));
-                if (null != field) {
-                    if (!field.isAccessible()) {
-                        field.setAccessible(true);
-                    }
-                    field.set(bean, sqlRowSet.getObject(columnName));
-                }
-            }
-            result.add(bean);
+  /**
+   * Convert list.
+   *
+   * @param <T>       the type parameter
+   * @param sqlRowSet the sql row set
+   * @param t         the t
+   * @return the list
+   * @throws Exception the exception
+   */
+  public static <T> List<T> convert(SqlRowSet sqlRowSet, T t) throws Exception {
+    List<T> result = new ArrayList<>(20);
+    String[] columnNames = sqlRowSet.getMetaData().getColumnNames();
+    Class clazz = t.getClass();
+    while (sqlRowSet.next()) {
+      T bean = (T) BeanReflectionUtil.newInstance(clazz);
+      for (String columnName : columnNames) {
+        Field field = clazz.getDeclaredField(StringUtil.convertColumnNameToUpperCamelCase(columnName));
+        if (null != field) {
+          if (!field.isAccessible()) {
+            field.setAccessible(true);
+          }
+          field.set(bean, sqlRowSet.getObject(columnName));
         }
-        return result;
+      }
+      result.add(bean);
     }
+    return result;
+  }
 
 }

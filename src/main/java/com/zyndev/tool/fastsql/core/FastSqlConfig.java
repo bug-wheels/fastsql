@@ -23,16 +23,14 @@
 
 package com.zyndev.tool.fastsql.core;
 
+import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import javax.sql.DataSource;
-
 
 /**
- * 继承 BeanFactoryPostProcessor
- * 扫描可以执行的 Repository 接口 并生成代理添加到 beanFactory 中
+ * 继承 BeanFactoryPostProcessor 扫描可以执行的 Repository 接口 并生成代理添加到 beanFactory 中
  *
  * @author 张瑀楠 zyndev@gmail.com
  * @version 0.0.1
@@ -40,21 +38,21 @@ import javax.sql.DataSource;
  */
 public class FastSqlConfig {
 
-    private final Log logger = LogFactory.getLog(FastSqlConfig.class);
+  private final Log logger = LogFactory.getLog(FastSqlConfig.class);
 
-    private DataSource dataSource;
+  private DataSource dataSource;
 
-    public JdbcTemplate getJdbcTemplate() {
-        return JdbcTemplateHolder.getInstance().getJdbcTemplate();
-    }
+  public JdbcTemplate getJdbcTemplate() {
+    return JdbcTemplateHolder.getInstance().getJdbcTemplate();
+  }
 
-    public synchronized void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
+  public synchronized void setDataSource(DataSource dataSource) {
+    this.dataSource = dataSource;
+  }
 
-    public synchronized void setJdbcTemplate(DataSource dataSource) {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-        JdbcTemplateHolder.setJdbcTemplate(jdbcTemplate);
-    }
+  public synchronized void setJdbcTemplate(DataSource dataSource) {
+    JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+    JdbcTemplateHolder.setJdbcTemplate(jdbcTemplate);
+  }
 
 }

@@ -10,9 +10,9 @@ import lombok.Data;
 @Data
 public class ConnectionInfo {
 
-    private String dbName;
-    private String filePath;
-    private String url;
-    private String userName;
-    private String password;
+  private String dbName;
+  private String filePath;
+  private String url;
+  private String userName;
+  private String password;
 }

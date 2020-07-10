@@ -1,7 +1,6 @@
 package com.zyndev;
 
 import com.zyndev.tool.fastsql.core.FastSqlRepositoryRegistrar;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 

@@ -10,17 +10,17 @@ import org.junit.Test;
  */
 public class AnnotationParseTest {
 
-    @Test
-    public void test() {
-        long start = 0;
-        long end = 0;
-        for(int i=0; i<1100; ++i) {
-            start = System.currentTimeMillis();
-            System.out.println(AnnotationParser.getTableName(new Stall()));
-            System.out.println(AnnotationParser.getTableAllColumn(new Stall()));
-            end = System.currentTimeMillis();
-            System.out.println(i + "次： " + (end - start));
-        }
+  @Test
+  public void test() {
+    long start = 0;
+    long end = 0;
+    for (int i = 0; i < 1100; ++i) {
+      start = System.currentTimeMillis();
+      System.out.println(AnnotationParser.getTableName(new Stall()));
+      System.out.println(AnnotationParser.getTableAllColumn(new Stall()));
+      end = System.currentTimeMillis();
+      System.out.println(i + "次： " + (end - start));
     }
+  }
 
 }

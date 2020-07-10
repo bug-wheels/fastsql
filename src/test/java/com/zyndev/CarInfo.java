@@ -1,17 +1,15 @@
 package com.zyndev;
 
-import lombok.Data;
-
+import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import java.io.Serializable;
-import java.util.List;
+import lombok.Data;
 
 /**
  * @author 张瑀楠 zyndev@gmail.com
- * @version 1.0
- * 2018/2/3 下午4:46
+ * @version 1.0 2018/2/3 下午4:46
  */
 @Data
 @Entity
@@ -19,17 +17,20 @@ import java.util.List;
 
 public class CarInfo implements Serializable {
 
-    @Column
-    private String imgUrl;
+  @Column
+  private String imgUrl;
 
-    @Column private Integer CarID;
+  @Column
+  private Integer CarID;
 
-    @Column private Integer year;
+  @Column
+  private Integer year;
 
-    @Column private String fullAmount;
+  @Column
+  private String fullAmount;
 
-    private List<String> starConfig;
+  private List<String> starConfig;
 
-    Param param;
+  Param param;
 
 }

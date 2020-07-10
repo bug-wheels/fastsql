@@ -37,10 +37,10 @@ import lombok.Data;
 @Data
 public class ColumnInfo {
 
-    private String type;
-    private String name;
-    private boolean id;
-    private String column;
-    private boolean nullable;
-    private String comment;
+  private String type;
+  private String name;
+  private boolean id;
+  private String column;
+  private boolean nullable;
+  private String comment;
 }

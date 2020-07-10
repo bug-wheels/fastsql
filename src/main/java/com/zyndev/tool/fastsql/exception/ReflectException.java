@@ -8,7 +8,8 @@ package com.zyndev.tool.fastsql.exception;
  * @date 2018/2/22 17:03
  */
 public class ReflectException extends RuntimeException {
-    public ReflectException(String message, Throwable cause) {
-        super(message, cause);
-    }
+
+  public ReflectException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

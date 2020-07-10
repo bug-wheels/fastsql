@@ -8,14 +8,17 @@
 
 package com.zyndev.tool.fastsql.repository;
 
-import lombok.*;
-
+import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.io.Serializable;
-import java.util.Date;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * @author 张瑀楠 zyndev@gmail.com
@@ -31,55 +34,55 @@ import java.util.Date;
 @Table(name = "tb_user")
 public class User implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    /**
-     *
-     */
-    @Id
-    @Column
-    private Integer id;
+  /**
+   *
+   */
+  @Id
+  @Column
+  private Integer id;
 
-    /**
-     *
-     */
-    @Column
-    private String uid;
+  /**
+   *
+   */
+  @Column
+  private String uid;
 
-    /**
-     * 登录用户名
-     */
-    @Column(name = "account_name")
-    private String accountName;
+  /**
+   * 登录用户名
+   */
+  @Column(name = "account_name")
+  private String accountName;
 
-    /**
-     * 最多10个汉字
-     */
-    @Column(name = "nick_name")
-    private String nickName;
+  /**
+   * 最多10个汉字
+   */
+  @Column(name = "nick_name")
+  private String nickName;
 
-    /**
-     *
-     */
-    @Column
-    private String password;
+  /**
+   *
+   */
+  @Column
+  private String password;
 
-    /**
-     *
-     */
-    @Column
-    private String phone;
+  /**
+   *
+   */
+  @Column
+  private String phone;
 
-    /**
-     *
-     */
-    @Column(name = "register_time")
-    private Date registerTime;
+  /**
+   *
+   */
+  @Column(name = "register_time")
+  private Date registerTime;
 
-    /**
-     *
-     */
-    @Column(name = "update_time")
-    private Date updateTime;
+  /**
+   *
+   */
+  @Column(name = "update_time")
+  private Date updateTime;
 
 }

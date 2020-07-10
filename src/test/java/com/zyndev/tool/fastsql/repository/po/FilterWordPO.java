@@ -1,13 +1,16 @@
 package com.zyndev.tool.fastsql.repository.po;
 
-import lombok.*;
-
+import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.io.Serializable;
-import java.util.Date;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * 过滤词设置
@@ -25,24 +28,24 @@ import java.util.Date;
 @Table(name = "tb_filter_word")
 public class FilterWordPO implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    @Id
-    @Column(name = "id", columnDefinition = "主键id")
-    private Integer id;
+  @Id
+  @Column(name = "id", columnDefinition = "主键id")
+  private Integer id;
 
-    @Column(name = "user_id", columnDefinition = "用户id")
-    private Long userId;
+  @Column(name = "user_id", columnDefinition = "用户id")
+  private Long userId;
 
-    @Column(name = "origin", columnDefinition = "原字符串")
-    private String origin;
+  @Column(name = "origin", columnDefinition = "原字符串")
+  private String origin;
 
-    @Column(name = "target", columnDefinition = "目标字符串")
-    private String target;
+  @Column(name = "target", columnDefinition = "目标字符串")
+  private String target;
 
-    @Column(name = "create_time", columnDefinition = "创建时间")
-    private Date createTime;
+  @Column(name = "create_time", columnDefinition = "创建时间")
+  private Date createTime;
 
-    @Column(name = "update_time", columnDefinition = "更新时间")
-    private Date updateTime;
+  @Column(name = "update_time", columnDefinition = "更新时间")
+  private Date updateTime;
 }

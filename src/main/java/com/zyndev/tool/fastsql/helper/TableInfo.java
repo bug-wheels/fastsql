@@ -23,9 +23,8 @@
 
 package com.zyndev.tool.fastsql.helper;
 
-import lombok.Data;
-
 import java.util.List;
+import lombok.Data;
 
 /**
  * 这里应该有描述
@@ -37,10 +36,10 @@ import java.util.List;
 @Data
 public class TableInfo {
 
-    private String tableName;
-    private String className;
-    private String createDate;
-    private String tableComment;
-    private List<ColumnInfo> columnInfoList;
+  private String tableName;
+  private String className;
+  private String createDate;
+  private String tableComment;
+  private List<ColumnInfo> columnInfoList;
 
 }

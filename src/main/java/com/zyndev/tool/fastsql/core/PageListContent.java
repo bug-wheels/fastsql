@@ -24,18 +24,16 @@
 package com.zyndev.tool.fastsql.core;
 
 
+import java.io.Serializable;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
-import java.util.List;
 
 /**
  * The type Page list content.
  *
  * @param <T> the type parameter
- *
  * @author yunan.zhang zyndev@gmail.com
  * @version 0.0.1
  */
@@ -43,40 +41,41 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 public class PageListContent<T> implements Serializable {
-    private static final long serialVersionUID = 1L;
 
-    private List<T> content;
-    private int pageNum;
-    private int pageSize;
-    private int totalNum;
-    private int totalPages;
+  private static final long serialVersionUID = 1L;
+
+  private List<T> content;
+  private int pageNum;
+  private int pageSize;
+  private int totalNum;
+  private int totalPages;
 
 
-    /**
-     * Sets data.
-     *
-     * @param pageNum  the page num
-     * @param pageSize the page size
-     * @param totalNum the total num
-     * @param content  the content
-     * @return the data
-     */
-    public static <T> PageListContent<T> setData(int pageNum, int pageSize, int totalNum, List<T> content) {
-        PageListContent<T> result = new PageListContent<>();
-        result.pageNum = pageNum;
-        result.pageSize = pageSize;
-        result.totalNum = totalNum;
-        result.totalPages = (totalNum + pageSize - 1) / pageSize;
-        result.content = content;
-        return result;
-    }
+  /**
+   * Sets data.
+   *
+   * @param pageNum  the page num
+   * @param pageSize the page size
+   * @param totalNum the total num
+   * @param content  the content
+   * @return the data
+   */
+  public static <T> PageListContent<T> setData(int pageNum, int pageSize, int totalNum, List<T> content) {
+    PageListContent<T> result = new PageListContent<>();
+    result.pageNum = pageNum;
+    result.pageSize = pageSize;
+    result.totalNum = totalNum;
+    result.totalPages = (totalNum + pageSize - 1) / pageSize;
+    result.content = content;
+    return result;
+  }
 
-    public int getTotalPages() {
-        return (totalNum + pageSize - 1) / pageSize;
-    }
+  public int getTotalPages() {
+    return (totalNum + pageSize - 1) / pageSize;
+  }
 
-    public int getOffset() {
-        return (pageNum - 1) * pageSize;
-    }
+  public int getOffset() {
+    return (pageNum - 1) * pageSize;
+  }
 
 }

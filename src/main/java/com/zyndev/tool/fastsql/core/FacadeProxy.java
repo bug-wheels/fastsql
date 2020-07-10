@@ -23,41 +23,40 @@
 
 package com.zyndev.tool.fastsql.core;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * 生成代理
  *
  * @author 张瑀楠 zyndev@gmail.com
  * @version 0.0.1
- * @since  2017 /12/23 上午12:40
+ * @since 2017 /12/23 上午12:40
  */
 public class FacadeProxy implements InvocationHandler {
 
-    private static final Log logger = LogFactory.getLog(FacadeProxy.class);
+  private static final Log logger = LogFactory.getLog(FacadeProxy.class);
 
-    @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        return StatementParser.invoke(proxy, method, args);
-    }
+  @Override
+  public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    return StatementParser.invoke(proxy, method, args);
+  }
 
-    /**
-     * New mapper proxy t.
-     *
-     * @param <T>             the type parameter
-     * @param mapperInterface the mapper interface
-     * @return the t
-     */
-    static <T> T newMapperProxy(Class<T> mapperInterface) {
-        logger.info(" 生成代理：" + mapperInterface.getName());
-        ClassLoader classLoader = mapperInterface.getClassLoader();
-        Class<?>[] interfaces = new Class[]{mapperInterface};
-        FacadeProxy proxy = new FacadeProxy();
-        return (T) Proxy.newProxyInstance(classLoader, interfaces, proxy);
-    }
+  /**
+   * New mapper proxy t.
+   *
+   * @param <T>             the type parameter
+   * @param mapperInterface the mapper interface
+   * @return the t
+   */
+  static <T> T newMapperProxy(Class<T> mapperInterface) {
+    logger.info(" 生成代理：" + mapperInterface.getName());
+    ClassLoader classLoader = mapperInterface.getClassLoader();
+    Class<?>[] interfaces = new Class[]{mapperInterface};
+    FacadeProxy proxy = new FacadeProxy();
+    return (T) Proxy.newProxyInstance(classLoader, interfaces, proxy);
+  }
 }

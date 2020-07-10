@@ -29,19 +29,18 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *
  * SQL 参数 Hint
  *
  * @author 张瑀楠 zyndev@gmail.com
  * @version 0.0.1
- * @since  2017/12/22 17:29
+ * @since 2017/12/22 17:29
  */
-@Target( { ElementType.PARAMETER })
+@Target({ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Param {
 
-    /**
-     * 指出这个值是 SQL 语句中哪个参数的值，使用命名参数
-     */
-    String value();
+  /**
+   * 指出这个值是 SQL 语句中哪个参数的值，使用命名参数
+   */
+  String value();
 }

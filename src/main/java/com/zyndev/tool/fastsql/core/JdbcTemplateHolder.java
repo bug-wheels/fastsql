@@ -34,28 +34,28 @@ import org.springframework.jdbc.core.JdbcTemplate;
  */
 public class JdbcTemplateHolder {
 
-    private static JdbcTemplateHolder instance = new JdbcTemplateHolder();
+  private static JdbcTemplateHolder instance = new JdbcTemplateHolder();
 
-    private static JdbcTemplate jdbcTemplate;
+  private static JdbcTemplate jdbcTemplate;
 
-    public JdbcTemplate getJdbcTemplate() {
-        return jdbcTemplate;
-    }
+  public JdbcTemplate getJdbcTemplate() {
+    return jdbcTemplate;
+  }
 
-    private JdbcTemplateHolder() {
-    }
+  private JdbcTemplateHolder() {
+  }
 
-    /**
-     * Gets instance.
-     *
-     * @return the instance
-     */
-    public static JdbcTemplateHolder getInstance() {
-        return instance;
-    }
+  /**
+   * Gets instance.
+   *
+   * @return the instance
+   */
+  public static JdbcTemplateHolder getInstance() {
+    return instance;
+  }
 
-    public static void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
-        JdbcTemplateHolder.jdbcTemplate = jdbcTemplate;
-    }
+  public static void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+    JdbcTemplateHolder.jdbcTemplate = jdbcTemplate;
+  }
 
 }

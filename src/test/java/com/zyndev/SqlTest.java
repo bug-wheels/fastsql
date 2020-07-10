@@ -26,70 +26,68 @@ package com.zyndev;
 import com.zyndev.tool.fastsql.repository.User;
 import com.zyndev.tool.fastsql.util.BeanReflectionUtil;
 import com.zyndev.tool.fastsql.util.StringUtil;
-import org.junit.Test;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import org.junit.Test;
 
 /**
- *
  * @author 张瑀楠 zyndev@gmail.com
  * @version 1.0
  * @date 2018/1/2 14:23
  */
 public class SqlTest {
 
-    @Test
-    public void test() throws Exception {
+  @Test
+  public void test() throws Exception {
 
-        String executeSql = "insert into tb_user(id, account_name, password) values(:id, :user.accountName, :user.password )";
+    String executeSql = "insert into tb_user(id, account_name, password) values(:id, :user.accountName, :user.password )";
 
-        Map<String, Object> namedParamMap = new HashMap<>();
-        namedParamMap.put("id", new Random().nextInt());
+    Map<String, Object> namedParamMap = new HashMap<>();
+    namedParamMap.put("id", new Random().nextInt());
 
-        User user = new User();
-        user.setAccountName("777");
-        user.setPassword("zyndev@gmail.com");
-        namedParamMap.put("user", user);
-        System.out.println("origin sql:" + executeSql);
+    User user = new User();
+    user.setAccountName("777");
+    user.setPassword("zyndev@gmail.com");
+    namedParamMap.put("user", user);
+    System.out.println("origin sql:" + executeSql);
 
-        List<String> results = StringUtil.matches(executeSql, "\\?\\d+(\\.[A-Za-z]+)?|:[A-Za-z0-9]+(\\.[A-Za-z]+)?");
-        Object[] params = null;
-        params = new Object[results.size()];
-        for (String result : results) {
-            System.out.println(result);
-            for (int i = 0; i < results.size(); ++i) {
-                if (results.get(i).charAt(0) == ':') {
-                    executeSql = executeSql.replaceFirst(results.get(i), "?");
-                    // 判断是否是 param.param 的格式
-                    if (!results.get(i).contains(".")) {
-                        params[i] = namedParamMap.get(results.get(i).substring(1));
-                    } else {
-                        String[] paramArgs = results.get(i).split("\\.");
-                        Object param = namedParamMap.get(paramArgs[0].substring(1));
-                        params[i] = BeanReflectionUtil.getFieldValue(param, paramArgs[1]);
-                    }
-                    continue;
-                }
-                int paramIndex = Integer.parseInt(results.get(i).substring(1));
-                executeSql = executeSql.replaceFirst("\\?" + paramIndex, "?");
-                params[i] = namedParamMap.get(results.get(i));
-            }
+    List<String> results = StringUtil.matches(executeSql, "\\?\\d+(\\.[A-Za-z]+)?|:[A-Za-z0-9]+(\\.[A-Za-z]+)?");
+    Object[] params = null;
+    params = new Object[results.size()];
+    for (String result : results) {
+      System.out.println(result);
+      for (int i = 0; i < results.size(); ++i) {
+        if (results.get(i).charAt(0) == ':') {
+          executeSql = executeSql.replaceFirst(results.get(i), "?");
+          // 判断是否是 param.param 的格式
+          if (!results.get(i).contains(".")) {
+            params[i] = namedParamMap.get(results.get(i).substring(1));
+          } else {
+            String[] paramArgs = results.get(i).split("\\.");
+            Object param = namedParamMap.get(paramArgs[0].substring(1));
+            params[i] = BeanReflectionUtil.getFieldValue(param, paramArgs[1]);
+          }
+          continue;
         }
-
-        System.out.println("execute sql:" + executeSql);
-        System.out.println("params : ------------------------------------------");
-        for (Object o : params) {
-            if (null != o) {
-                System.out.print(o.toString() + ",\t");
-            } else {
-                System.out.print("null,\t");
-            }
-        }
-        System.out.println("\n end ------------------------------------------");
+        int paramIndex = Integer.parseInt(results.get(i).substring(1));
+        executeSql = executeSql.replaceFirst("\\?" + paramIndex, "?");
+        params[i] = namedParamMap.get(results.get(i));
+      }
     }
+
+    System.out.println("execute sql:" + executeSql);
+    System.out.println("params : ------------------------------------------");
+    for (Object o : params) {
+      if (null != o) {
+        System.out.print(o.toString() + ",\t");
+      } else {
+        System.out.print("null,\t");
+      }
+    }
+    System.out.println("\n end ------------------------------------------");
+  }
 
 
 }

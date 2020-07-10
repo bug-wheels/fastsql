@@ -23,9 +23,8 @@
 
 package com.zyndev.tool.fastsql.core;
 
-import lombok.Data;
-
 import javax.persistence.GenerationType;
+import lombok.Data;
 
 /**
  * The type Db column info.
@@ -36,62 +35,58 @@ import javax.persistence.GenerationType;
 @Data
 public class DBColumnInfo {
 
-    /**
-     * (Optional) The primary key generation strategy
-     * that the persistence provider must use to
-     * generate the annotated entity primary key.
-     */
-    private GenerationType strategy = GenerationType.AUTO;
+  /**
+   * (Optional) The primary key generation strategy that the persistence provider must use to generate the annotated
+   * entity primary key.
+   */
+  private GenerationType strategy = GenerationType.AUTO;
 
-    /**
-     * The name of field
-     */
-    private String fieldName;
+  /**
+   * The name of field
+   */
+  private String fieldName;
 
-    /**
-     * The name of the column
-     */
-    private String columnName;
+  /**
+   * The name of the column
+   */
+  private String columnName;
 
 
-    /**
-     * Whether the column is a unique key.
-     */
-    private boolean unique;
+  /**
+   * Whether the column is a unique key.
+   */
+  private boolean unique;
 
-    /**
-     * Whether the database column is nullable.
-     */
-    private boolean nullable = true;
+  /**
+   * Whether the database column is nullable.
+   */
+  private boolean nullable = true;
 
-    /**
-     * Whether the column is included in SQL INSERT
-     */
-    private boolean insertable = true;
+  /**
+   * Whether the column is included in SQL INSERT
+   */
+  private boolean insertable = true;
 
-    /**
-     * Whether the column is included in SQL UPDATE
-     */
-    private boolean updatable = true;
+  /**
+   * Whether the column is included in SQL UPDATE
+   */
+  private boolean updatable = true;
 
-    /**
-     * The SQL fragment that is used when
-     * generating the DDL for the column.
-     */
-    private String columnDefinition;
+  /**
+   * The SQL fragment that is used when generating the DDL for the column.
+   */
+  private String columnDefinition;
 
-    /**
-     * The name of the table that contains the column.
-     * If absent the column is assumed to be in the primary table.
-     */
-    private String table;
+  /**
+   * The name of the table that contains the column. If absent the column is assumed to be in the primary table.
+   */
+  private String table;
 
-    /**
-     * (Optional) The column length. (Applies only if a
-     * string-valued column is used.)
-     */
-    private int length =  255;
+  /**
+   * (Optional) The column length. (Applies only if a string-valued column is used.)
+   */
+  private int length = 255;
 
-    private boolean id = false;
+  private boolean id = false;
 
 }

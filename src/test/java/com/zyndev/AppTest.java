@@ -18,16 +18,16 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @EnableFastSql
 public class AppTest {
 
-    @Autowired
-    private UserRepository userRepository;
+  @Autowired
+  private UserRepository userRepository;
 
-    @Test
-    public void testApp() {
-        System.out.println("getCount:\t" + userRepository.getCount());
-        System.out.println("deleteById:\t" + userRepository.deleteById(3));
-        System.out.println("getCountByPassword:\t" + userRepository.getCountByPassword("zhang"));
-        System.out.println("getUidByPassword:\t" + userRepository.getUidByPassword("123456"));
-        System.out.println("queryUserByName:" + userRepository.queryUserByName("abc"));
-        // userRepository.queryUserByName("");
-    }
+  @Test
+  public void testApp() {
+    System.out.println("getCount:\t" + userRepository.getCount());
+    System.out.println("deleteById:\t" + userRepository.deleteById(3));
+    System.out.println("getCountByPassword:\t" + userRepository.getCountByPassword("zhang"));
+    System.out.println("getUidByPassword:\t" + userRepository.getUidByPassword("123456"));
+    System.out.println("queryUserByName:" + userRepository.queryUserByName("abc"));
+    // userRepository.queryUserByName("");
+  }
 }
